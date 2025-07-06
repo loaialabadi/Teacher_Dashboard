@@ -2,19 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\ParentModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 
 class ParentModelFactory extends Factory
 {
-    protected $model = ParentModel::class;
-
-    public function definition()
+    public function definition(): array
     {
         return [
-            'name' => $this->faker->name(),
-            'phone' => $this->faker->phoneNumber(),
-            'password' => bcrypt('password'), // كلمة سر مشفرة
+            'name' => $this->faker->name,
+            'phone' => $this->faker->unique()->phoneNumber,
+            'password' => Hash::make('123456'), // كلمة مرور افتراضية
         ];
     }
 }

@@ -50,5 +50,7 @@ public function class()
     return $this->belongsTo(SchoolClass::class, 'class_id');
 }
 
+
+
 }
 

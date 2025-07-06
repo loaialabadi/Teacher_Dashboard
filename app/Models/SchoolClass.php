@@ -2,10 +2,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 class SchoolClass extends Model
+
 {
-    protected $table = 'classes';
+        use HasFactory;  // << مهم جداً
+
+    protected $table = 'school_classes';
 
     protected $fillable = ['teacher_id', 'subject_id', 'date', 'start_time', 'end_time', 'description'];
 

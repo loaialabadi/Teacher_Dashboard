@@ -5,20 +5,26 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Appointment;
 use App\Models\Group;
+use App\Models\Teacher;
 
 class AppointmentSeeder extends Seeder
 {
     public function run()
     {
-        $group = Group::first();
+        $groups = Group::all();
+        $teachers = Teacher::all();
 
-        Appointment::create([
-            'group_id' => $group->id,
-                'teacher_id' => 1,  // مثال: معرف المعلم
+        if ($groups->isEmpty() || $teachers->isEmpty()) {
+            $this->command->error("تأكد من وجود مجموعات ومدرسين قبل إضافة المواعيد.");
+            return;
+        }
 
-            'start_time' => now()->addDays(1)->setTime(9, 0),
-            'end_time' => now()->addDays(1)->setTime(10, 0),
-            'subject' => 'رياضيات',
-        ]);
+        Appointment::factory(10)->make()->each(function ($appointment) use ($groups, $teachers) {
+            $appointment->group_id = $groups->random()->id;
+            $appointment->teacher_id = $teachers->random()->id;
+            $appointment->save();
+
+            $this->command->info("تم إنشاء موعد لمجموعة #{$appointment->group_id} مع مدرس #{$appointment->teacher_id} بتاريخ {$appointment->date}");
+        });
     }
 }

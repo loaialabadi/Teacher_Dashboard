@@ -3,19 +3,28 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Group;
 use App\Models\Teacher;
+use App\Models\SchoolClass;
+use App\Models\Group;
 
 class GroupSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        $teacher = Teacher::first();
+        $teachers = Teacher::all();
+        $classes = SchoolClass::all();
 
-        Group::create([
-            'teacher_id' => $teacher->id,
-            'name' => 'المجموعة الأولى',
-            'grade_id' => null, // ضع الرقم المناسب إذا عندك جدول للفصول الدراسية
-        ]);
+        if ($teachers->isEmpty() || $classes->isEmpty()) {
+            $this->command->error("تأكد من وجود مدرسين وفصول دراسية قبل إنشاء المجموعات.");
+            return;
+        }
+
+        foreach (range(1, 10) as $i) {
+            Group::create([
+                'name' => 'مجموعة ' . $i,
+                'teacher_id' => $teachers->random()->id,
+                'class_id' => $classes->random()->id,
+            ]);
+        }
     }
 }
