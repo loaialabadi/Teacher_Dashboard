@@ -38,6 +38,11 @@ protected static function booted()
     return $this->hasMany(Group::class);
 }
 
+public function schoolClasses()
+{
+    return $this->belongsToMany(SchoolClass::class, 'class_teacher');
+}
+
 
 
 }

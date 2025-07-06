@@ -3,7 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ClassModel extends Model
+class SchoolClass extends Model
 {
     protected $table = 'classes';
 
@@ -23,6 +23,11 @@ class ClassModel extends Model
     {
         return $this->hasMany(Attendance::class, 'class_id');
     }
+
+    public function teachers()
+{
+    return $this->belongsToMany(Teacher::class, 'class_teacher');
+}
 
 }
 

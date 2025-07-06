@@ -43,5 +43,12 @@ public function appointments()
 {
     return $this->hasMany(Appointment::class);
 }
+
+// Student.php
+public function class()
+{
+    return $this->belongsTo(SchoolClass::class, 'class_id');
+}
+
 }
 

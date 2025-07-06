@@ -10,11 +10,15 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('teacher_id');
             $table->string('name');  // اسم المجموعة
-            $table->unsignedBigInteger('grade_id')->nullable();  // الفصل الدراسي إن وُجد
+
+
+            $table->unsignedBigInteger('class_id')->nullable();  // عمود جديد
+            $table->foreign('class_id')->references('id')->on('school_classes')->onDelete('set null');
+
             $table->timestamps();
 
+
             $table->foreign('teacher_id')->references('id')->on('teachers')->onDelete('cascade');
-            $table->foreign('grade_id')->references('id')->on('classes')->onDelete('set null');
         });
     }
 

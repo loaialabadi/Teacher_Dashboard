@@ -11,6 +11,9 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('name');
             $table->string('phone')->nullable();
+            // students table
+$table->foreignId('class_id')->constrained('school_classes')->onDelete('cascade');
+
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->unsignedBigInteger('teacher_id')->nullable();  // ربط الطالب بالمعلم
 

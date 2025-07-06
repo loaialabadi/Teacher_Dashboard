@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up() {
-        Schema::create('classes', function (Blueprint $table) {
+        Schema::create('school_classes', function (Blueprint $table) {
             $table->id();
             $table->string('name');  // اسم الفصل الدراسي، مثل "الفصل الأول"
             $table->timestamps();
@@ -14,6 +14,6 @@ return new class extends Migration {
     }
 
     public function down() {
-        Schema::dropIfExists('classes');
+        Schema::dropIfExists('school_classes');
     }
 };
