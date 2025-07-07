@@ -5,17 +5,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
-        Schema::create('class_teacher', function (Blueprint $table) {
+        Schema::create('grade_teacher', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('teacher_id')->constrained()->onDelete('cascade');
-            $table->foreignId('school_class_id')->constrained()->onDelete('cascade');
+            $table->foreignId('school_grade_id')->constrained()->onDelete('cascade');
 
             $table->timestamps();
+            $table->unique(['teacher_id', 'school_grade_id']);
         });
     }
 
     public function down(): void {
-        Schema::dropIfExists('class_teacher');
+        Schema::dropIfExists('grade_teacher');
     }
 };

@@ -11,13 +11,14 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('name');
             $table->string('phone')->nullable();
-            // students table
-$table->foreignId('class_id')->constrained('school_classes')->onDelete('cascade');
+
+            // المفتاح الأجنبي المرتبط بـ school_grades
+            $table->foreignId('class_id')->nullable()->constrained('school_grades')->onDelete('cascade');
 
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->unsignedBigInteger('teacher_id')->nullable();  // ربط الطالب بالمعلم
 
-            // المفاتيح الأجنبية
+            // المفاتيح الأجنبية الأخرى
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('parent_id')->references('id')->on('parents')->onDelete('set null');
             $table->foreign('teacher_id')->references('id')->on('teachers')->onDelete('set null');

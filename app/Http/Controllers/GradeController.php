@@ -1,19 +1,20 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Models\ClassModel;
+use App\Models\SchoolGrade;  // غيّر إلى الموديل الصحيح لديك
 use App\Models\Teacher;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 
-class ClassController extends Controller
+class GradeController
 {
     public function create()
     {
         $teachers = Teacher::all();
         $subjects = Subject::all();
 
-        return view('classes.create', compact('teachers', 'subjects'));
+        return view('grade.create', compact('teachers', 'subjects'));
     }
 
     public function store(Request $request)
@@ -27,15 +28,15 @@ class ClassController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        ClassModel::create($request->all());
+        SchoolGrade::create($request->all());  // تأكد من اسم الموديل الصحيح
 
-        return redirect()->route('classes.index')->with('success', 'تم إضافة الحصة بنجاح');
+        return redirect()->route('grade.index')->with('success', 'تم إضافة الحصة بنجاح');
     }
 
     public function index()
     {
-        $classes = ClassModel::with('teacher', 'subject')->orderBy('date', 'desc')->paginate(10);
+        $grades = SchoolGrade::with('teacher', 'subject')->orderBy('date', 'desc')->paginate(10);
 
-        return view('classes.index', compact('classes'));
+        return view('grade.index', compact('grades'));
     }
 }

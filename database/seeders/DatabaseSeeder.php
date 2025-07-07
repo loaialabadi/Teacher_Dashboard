@@ -7,14 +7,17 @@ use App\Models\Teacher;
 use App\Models\Student;
 use App\Models\Group;
 use App\Models\Appointment;
-use App\Models\SchoolClass;
+use App\Models\SchoolGrade;
 use App\Models\ClassTeacher;
+use App\Models\GradeTeacher;
+
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
     $this->call([
-        SchoolClassSeeder::class,
+       SchoolGradeSeeder::class,
+
         ParentSeeder::class,
         TeacherSeeder::class,
         StudentSeeder::class,
@@ -24,7 +27,14 @@ class DatabaseSeeder extends Seeder
 
 
     ]);
-         ClassTeacher::factory()->count(10)->create();
+$someTeacherId = \App\Models\Teacher::inRandomOrder()->first()->id;
+$someGradeId = \App\Models\SchoolGrade::inRandomOrder()->first()->id;
+
+GradeTeacher::factory()->create([
+    'teacher_id' => $someTeacherId,
+    'school_grade_id' => $someGradeId,
+]);
+
 
 
 }}

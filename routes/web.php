@@ -56,7 +56,7 @@ Route::get('/', function () {
 
         // عرض الطلاب
         Route::get('/showstudents', [TeacherController::class, 'showStudents'])->name('teachers.showstudents');
-
+Route::get('/show-classes', [TeacherController::class, 'showClasses'])->name('teachers.showclasses');
         // الحضور الخاص بالمعلم
         Route::get('/attendance', [TeachersController::class, 'showAttendance'])->name('teachers.showattendance');
     });

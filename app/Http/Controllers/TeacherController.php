@@ -6,6 +6,7 @@ use App\Models\Teacher;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use App\Models\Appointment;
+use App\Models\SchoolGrade;
 class TeacherController extends Controller
 {
     // عرض جميع المعلمين مع المادة الخاصة بهم
@@ -48,5 +49,15 @@ public function showStudents($teacherId)
     // إرسال البيانات إلى الـ view
     return view('teacher.show-students', compact('teacher'));
 }
+
+
+public function showClasses(Teacher $teacher)
+{
+    // تحميل الفصول مع المجموعات، وكل مجموعة مع طلابها
+    $SchoolGrades = $teacher->SchoolGrades()->with('groups.students')->get();
+
+    return view('teacher.show-classes', compact('teacher', 'SchoolGrades'));
+}
+
 
 }

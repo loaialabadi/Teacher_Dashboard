@@ -3,11 +3,11 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\SchoolClass;
+use App\Models\SchoolGrade;  // أو Grade حسب اسم الموديل الصحيح
 
-class SchoolClassFactory extends Factory
+class SchoolGradeFactory extends Factory
 {
-    protected $model = SchoolClass::class;
+    protected $model = SchoolGrade::class;  // تأكد من اسم الموديل الصحيح
 
     public function definition()
     {

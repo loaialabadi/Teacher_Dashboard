@@ -24,9 +24,10 @@
             <i class="fas fa-users"></i> عرض المجموعات
         </a>
 
-        <a href="{{ route('teachers.showattendance', $teacher->id) }}" class="btn btn-info">
+            <a href="{{ route('teachers.showclasses', $teacher->id) }}" class="btn btn-info">
             <i class="fas fa-check-circle"></i> عرض الفصول الدراسية
         </a>
+
 
 @if ($groupId)
     <a href="{{ route('appointments.create', ['teacher' => $teacher->id, 'group' => $groupId]) }}" class="btn btn-primary">

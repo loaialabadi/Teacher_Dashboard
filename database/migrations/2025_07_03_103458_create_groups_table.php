@@ -12,8 +12,7 @@ return new class extends Migration {
             $table->string('name');  // اسم المجموعة
 
 
-            $table->unsignedBigInteger('class_id')->nullable();  // عمود جديد
-            $table->foreign('class_id')->references('id')->on('school_classes')->onDelete('set null');
+            $table->foreignId('class_id')->nullable()->constrained('school_grades')->onDelete('set null');
 
             $table->timestamps();
 

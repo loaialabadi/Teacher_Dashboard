@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use APP\Models\SchoolGradees;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -38,11 +39,12 @@ protected static function booted()
     return $this->hasMany(Group::class);
 }
 
-public function schoolClasses()
+public function SchoolGrades()
 {
-    return $this->belongsToMany(SchoolClass::class, 'class_teacher');
+return $this->belongsToMany(SchoolGrade::class, 'grade_teacher');
+
+
+
+
 }
-
-
-
 }
