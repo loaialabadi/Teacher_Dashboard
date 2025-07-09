@@ -11,6 +11,10 @@ use App\Http\Controllers\ParentController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\GradeController;
+use App\Http\Controllers\SchoolGradeController;
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\LectureController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -56,7 +60,7 @@ Route::get('/', function () {
 
         // عرض الطلاب
         Route::get('/showstudents', [TeacherController::class, 'showStudents'])->name('teachers.showstudents');
-Route::get('/show-classes', [TeacherController::class, 'showClasses'])->name('teachers.showclasses');
+Route::get('/show-grades', [TeacherController::class, 'showGrades'])->name('teachers.showgrades');
         // الحضور الخاص بالمعلم
         Route::get('/attendance', [TeachersController::class, 'showAttendance'])->name('teachers.showattendance');
     });
@@ -93,8 +97,53 @@ Route::post('teachers/{teacher}/groups/{group}/add-student', [GroupController::c
 
 
 
-Route::get('teachers/{teacher}/students/create', [StudentController::class, 'create'])->name('students.create');
-Route::post('teachers/{teacher}/students', [StudentController::class, 'store'])->name('students.store');
+
+Route::prefix('teachers/{teacher}')->group(function () {
+    Route::resource('students', StudentController::class);
+});
+
+
+// Route::resource('grades', GradeController::class);
+
+Route::prefix('teachers/{teacher}')->group(function () {
+    Route::resource('grades', GradeController::class);
+});
+
+
+Route::get('/teachers/{teacher}/subjects', [SubjectController::class, 'index'])->name('subjects.index');
+Route::get('/teachers/{teacher}/subjects/create', [SubjectController::class, 'create'])->name('subjects.create');
+Route::post('/teachers/{teacher}/subjects', [SubjectController::class, 'store'])->name('subjects.store');
+Route::get('/teachers/{teacher}/subjects/{subject}/edit', [SubjectController::class, 'edit'])->name('subjects.edit');
+Route::put('/teachers/{teacher}/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
+Route::delete('/teachers/{teacher}/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
+
+
+
+
+Route::prefix('teachers/{teacher}/lectures')->controller(LectureController::class)->group(function () {
+    Route::get('/', 'index')->name('lectures.index');
+    Route::get('/create', 'create')->name('lectures.create');
+    Route::post('/', 'store')->name('lectures.store');
+    Route::get('/{lecture}/edit', 'edit')->name('lectures.edit');
+    Route::put('/{lecture}', 'update')->name('lectures.update');
+    Route::delete('/{lecture}', 'destroy')->name('lectures.destroy');
+
+});
+
+
+
+
+
+Route::prefix('teachers/{teacher}')->group(function () {
+    Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
+    Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
+    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+    Route::get('/groups/{group}/edit', [GroupController::class, 'edit'])->name('groups.edit');
+    Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
+});
+
+
+Route::resource('teachers.students', StudentController::class);
 
 require __DIR__.'/auth.php';
 require __DIR__.'/api.php';

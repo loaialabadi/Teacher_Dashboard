@@ -2,7 +2,7 @@
 
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use APP\Models\SchoolGradees;
+use App\Models\Grade;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,6 +22,7 @@ public function students()
     return $this->hasMany(Student::class);
 }
 
+
 protected static function booted()
 {
     static::deleting(function ($teacher) {
@@ -39,12 +40,28 @@ protected static function booted()
     return $this->hasMany(Group::class);
 }
 
-public function SchoolGrades()
+public function schoolGrades()
 {
-return $this->belongsToMany(SchoolGrade::class, 'grade_teacher');
-
-
-
-
+    return $this->belongsToMany(SchoolGrade::class, 'grade_teacher', 'teacher_id', 'grade_id');
 }
+
+
+public function subjects()
+{
+    return $this->belongsToMany(Subject::class, 'subject_teacher', 'teacher_id', 'subject_id');
+}
+
+
+public function lectures()
+{
+    return $this->hasMany(Lecture::class);
+}
+
+
+public function grades()
+{
+    return $this->belongsToMany(Grade::class, 'grade_teacher', 'teacher_id', 'grade_id');
+}
+
+
 }

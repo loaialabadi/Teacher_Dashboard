@@ -8,33 +8,38 @@ use App\Models\Student;
 use App\Models\Group;
 use App\Models\Appointment;
 use App\Models\SchoolGrade;
-use App\Models\ClassTeacher;
 use App\Models\GradeTeacher;
+use App\Models\Subject;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-    $this->call([
-       SchoolGradeSeeder::class,
+        $this->call([
+            ParentSeeder::class,
+            TeacherSeeder::class,
+            StudentSeeder::class,
+            GroupSeeder::class,
+            AppointmentSeeder::class,
+            GroupStudentSeeder::class,
+            GradeSeeder::class,
+        ]);
+        $this->call(SubjectSeeder::class);
 
-        ParentSeeder::class,
-        TeacherSeeder::class,
-        StudentSeeder::class,
-        GroupSeeder::class,
-        AppointmentSeeder::class,
-                     GroupStudentSeeder::class,
+Student::factory()->count(20)->create();
 
+        // ربط المعلم بأحد الفصول الدراسية
+        $someTeacherId = Teacher::inRandomOrder()->first()->id;
+        $someGradeId = \App\Models\Grade::inRandomOrder()->first()->id;
 
-    ]);
-$someTeacherId = \App\Models\Teacher::inRandomOrder()->first()->id;
-$someGradeId = \App\Models\SchoolGrade::inRandomOrder()->first()->id;
+        GradeTeacher::factory()->create([
+            'teacher_id' => $someTeacherId,
+            'grade_id' => $someGradeId,
+        ]);
 
-GradeTeacher::factory()->create([
-    'teacher_id' => $someTeacherId,
-    'school_grade_id' => $someGradeId,
-]);
-
-
-
-}}
+        // ربط المعلم ببعض المواد الدراسية
+        $teacher = Teacher::inRandomOrder()->first();
+        $subjects = Subject::inRandomOrder()->limit(3)->pluck('id');
+        $teacher->subjects()->sync($subjects);  // تأكد إن العلاقة موجودة في موديل Teacher
+    }
+}

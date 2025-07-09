@@ -2,41 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SchoolGrade;  // غيّر إلى الموديل الصحيح لديك
+use App\Models\SchoolGrade;
 use App\Models\Teacher;
 use App\Models\Subject;
 use Illuminate\Http\Request;
-
-class GradeController
+Use App\Models\Grade;
+class GradeController extends Controller
 {
-    public function create()
-    {
-        $teachers = Teacher::all();
-        $subjects = Subject::all();
 
-        return view('grade.create', compact('teachers', 'subjects'));
-    }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'teacher_id' => 'required|exists:teachers,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'date' => 'required|date',
-            'start_time' => 'required',
-            'end_time' => 'required|after:start_time',
-            'description' => 'nullable|string',
-        ]);
+//   public function index()
+// {
+//     $grades = SchoolGrade::with('teacher', 'subject')->orderBy('created_at', 'desc')->paginate(10);
 
-        SchoolGrade::create($request->all());  // تأكد من اسم الموديل الصحيح
+//     return view('grades.index', compact('grades'));
+// }
 
-        return redirect()->route('grade.index')->with('success', 'تم إضافة الحصة بنجاح');
-    }
 
-    public function index()
-    {
-        $grades = SchoolGrade::with('teacher', 'subject')->orderBy('date', 'desc')->paginate(10);
+  public function create(Teacher $teacher)
+{
+    $grades = Grade::all(); // جدول الفصول الدراسية
+    return view('grades.create', compact('teacher', 'grades'));
+}
 
-        return view('grade.index', compact('grades'));
-    }
+
+public function store(Request $request, $teacherId)
+{
+    $validated = $request->validate([
+        'grade_id' => 'required|exists:grades,id',
+    ]);
+
+    \App\Models\GradeTeacher::create([
+        'teacher_id' => $teacherId,
+        'grade_id' => $validated['grade_id'],
+    ]);
+
+    return redirect()->route('grades.index', $teacherId)
+                     ->with('success', 'تم إضافة الفصل الدراسي بنجاح.');
+}
+
+
+
+public function index(Teacher $teacher)
+{
+    $grades = $teacher->grades()->with('subject')->paginate(10);
+    
+    return view('grades.index', compact('teacher', 'grades'));
+}
+
+
+    // أضف الدوال edit, update, destroy حسب حاجتك
 }

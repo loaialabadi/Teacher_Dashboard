@@ -3,7 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use App\Models\schoolGrades;  // تأكد من استيراد الكلاس الصحيح
 class SchoolGrade extends Model  // كان ينقص كلمة 'extends' واسم الكلاس كان خاطئ
 {
     use HasFactory;  // مهم جداً
@@ -34,6 +34,13 @@ protected $table = 'school_grades';
 
     public function groups()
     {
-        return $this->hasMany(Group::class, 'grade_id');  // تأكد من أن عمود 'Grade_id' في جدول المجموعات مرتبط هنا
+        return $this->hasMany(Group::class, 'school_grade_id');  // تأكد من أن عمود 'Grade_id' في جدول المجموعات مرتبط هنا
     }
+
+    public function schoolGrades()
+{
+    return $this->belongsToMany(SchoolGrade::class, 'grade_teacher', 'teacher_id', 'grade_id');
+}
+
+    
 }

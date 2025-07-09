@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable; // استخدم Authenticatable للمصادقة
 use Laravel\Sanctum\HasApiTokens;
-
+use App\Models\Subject;
+use App\Models\Teacher;
+use App\Models\ParentModel;
 class Student extends Authenticatable
 {
     use HasApiTokens, HasFactory;
@@ -45,9 +47,9 @@ public function appointments()
 }
 
 // Student.php
-public function class()
+public function grade()
 {
-    return $this->belongsTo(SchoolClass::class, 'class_id');
+    return $this->belongsTo(SchoolGrade::class, 'school_grade_id');
 }
 
 

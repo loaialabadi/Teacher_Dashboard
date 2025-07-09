@@ -2,27 +2,24 @@
 
 namespace Database\Factories;
 
+use App\Models\Student;
+use App\Models\ParentModel;
+use App\Models\Teacher;
+use App\Models\Grade;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Student>
- */
 class StudentFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Student::class;
+
     public function definition(): array
     {
         return [
-                      'name' => $this->faker->name,
-            'phone' => $this->faker->unique()->phoneNumber,
-            // سيتم ملؤها في Seeder:
-            'parent_id' => 1,
-            'teacher_id' => 1,
-            'class_id' => 1,
+            'name' => $this->faker->name,
+            'phone' => '01' . $this->faker->numberBetween(100000000, 999999999),
+            'parent_id' => ParentModel::inRandomOrder()->first()?->id ?? ParentModel::factory(),
+            'teacher_id' => Teacher::inRandomOrder()->first()?->id ?? Teacher::factory(),
+            'grade_id' => Grade::inRandomOrder()->first()?->id ?? Grade::factory(),
         ];
     }
 }

@@ -9,10 +9,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Subject extends Model
 {
  use HasFactory;  // تأكد من إضافة هذه الس
-public function teachers()
-{
-    return $this->hasMany(Teacher::class);
-}
+
+    protected $fillable = ['name'];
 
     public function students()
     {
@@ -20,4 +18,9 @@ public function teachers()
     }
 
     
+public function teachers()
+{
+    return $this->belongsToMany(Teacher::class, 'subject_teacher', 'subject_id', 'teacher_id');
+}
+
 }

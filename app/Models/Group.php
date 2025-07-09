@@ -28,6 +28,10 @@ class Group extends Model
     }
 
 
+public function schoolGrade()
+{
+    return $this->belongsTo(SchoolGrade::class, 'grade_id');  // أو 'school_grade_id'
+}
 
 }
 

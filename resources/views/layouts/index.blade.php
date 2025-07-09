@@ -30,7 +30,7 @@
       <i class="fas fa-chalkboard-teacher"></i> <span>المعلمون</span>
     </a>
 
-    <a href="{{ route('students.index') }}" class="{{ request()->routeIs('students.*') ? 'active' : '' }}">
+<a href="{{ route('students.index', ['teacher' => $teacher->id]) }}">...</a>
       <i class="fas fa-user-graduate"></i> <span>الطلاب</span>
     </a>
 

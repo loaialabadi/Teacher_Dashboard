@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->string('name');  // اسم المجموعة
 
 
-            $table->foreignId('class_id')->nullable()->constrained('school_grades')->onDelete('set null');
+            $table->foreignId('grade_id')->nullable()->constrained('grades')->onDelete('set null');
 
             $table->timestamps();
 

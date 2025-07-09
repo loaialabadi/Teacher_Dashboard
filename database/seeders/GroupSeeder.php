@@ -4,17 +4,17 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Teacher;
-use App\Models\SchoolGrade;
 use App\Models\Group;
+use App\Models\Grade; // تأكد من استيراد الموديل المناسب
 
 class GroupSeeder extends Seeder
 {
     public function run(): void
     {
         $teachers = Teacher::all();
-        $classes = SchoolGrade::all();
+        $grades = Grade::all();
 
-        if ($teachers->isEmpty() || $classes->isEmpty()) {
+        if ($teachers->isEmpty() || $grades->isEmpty()) {
             $this->command->error("تأكد من وجود مدرسين وفصول دراسية قبل إنشاء المجموعات.");
             return;
         }
@@ -23,7 +23,7 @@ class GroupSeeder extends Seeder
             Group::create([
                 'name' => 'مجموعة ' . $i,
                 'teacher_id' => $teachers->random()->id,
-'class_id' => $classes->random()->id,
+'school_grade_id' => $grades->random()->id,
 
             ]);
         }

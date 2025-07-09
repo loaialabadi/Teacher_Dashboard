@@ -51,12 +51,11 @@ public function showStudents($teacherId)
 }
 
 
-public function showClasses(Teacher $teacher)
+public function showGrades(Teacher $teacher)
 {
-    // تحميل الفصول مع المجموعات، وكل مجموعة مع طلابها
-    $SchoolGrades = $teacher->SchoolGrades()->with('groups.students')->get();
+    $grades = $teacher->schoolGrades()->with('groups.students')->get();
 
-    return view('teacher.show-classes', compact('teacher', 'SchoolGrades'));
+    return view('teacher.show-grades', compact('teacher', 'grades'));
 }
 
 

@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->string('phone')->nullable();
 
             // المفتاح الأجنبي المرتبط بـ school_grades
-            $table->foreignId('class_id')->nullable()->constrained('school_grades')->onDelete('cascade');
+            $table->foreignId('grade_id')->nullable()->constrained('grades')->onDelete('cascade');
 
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->unsignedBigInteger('teacher_id')->nullable();  // ربط الطالب بالمعلم
