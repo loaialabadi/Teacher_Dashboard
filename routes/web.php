@@ -145,5 +145,10 @@ Route::prefix('teachers/{teacher}')->group(function () {
 
 Route::resource('teachers.students', StudentController::class);
 
+
+Route::get('teachers/{teacher}/groups/{sourceGroup}/transfer', [GroupController::class, 'transferForm'])->name('groups.transferForm');
+Route::post('teachers/{teacher}/groups/{sourceGroup}/transfer', [GroupController::class, 'transfer'])->name('groups.transfer');
+
+
 require __DIR__.'/auth.php';
 require __DIR__.'/api.php';
