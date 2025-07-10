@@ -150,5 +150,18 @@ Route::get('teachers/{teacher}/groups/{sourceGroup}/transfer', [GroupController:
 Route::post('teachers/{teacher}/groups/{sourceGroup}/transfer', [GroupController::class, 'transfer'])->name('groups.transfer');
 
 
+
+// عرض الفورم (اختياري لو بدك صفحة إضافة)
+Route::get('/teachers/{teacher}/groups/{group}/add-student', [GroupController::class, 'showAddStudentForm'])
+    ->name('groups.add-student.form');
+
+// تنفيذ الإضافة (POST)
+Route::post('/teachers/{teacher}/groups/{group}/add-student', [GroupController::class, 'addStudentToGroup'])
+    ->name('groups.add-student');
+
+
+
+    Route::post('/teachers/{teacher}/lectures/multiple', [LectureController::class, 'storeMultiple'])->name('lectures.storeMultiple');
+
 require __DIR__.'/auth.php';
 require __DIR__.'/api.php';

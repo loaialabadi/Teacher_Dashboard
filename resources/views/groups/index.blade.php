@@ -24,7 +24,7 @@
                     <a href="{{ route('groups.transferForm', ['teacher' => $teacher->id, 'sourceGroup' => $group->id]) }}" class="btn btn-outline-warning btn-sm">
                         <i class="fas fa-random"></i> نقل طلاب
                     </a>
-                    <a href="{{ route('groups.addStudentForm', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="btn btn-outline-success btn-sm">
+                    <a href="{{ route('groups.add-student', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="btn btn-outline-success btn-sm">
                         <i class="fas fa-user-plus"></i> إضافة طالب
                     </a>
                 </div>

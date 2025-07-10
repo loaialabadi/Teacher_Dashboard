@@ -9,14 +9,14 @@ use Illuminate\Http\Request;
 class StudentController extends Controller
 {
     // عرض كل الطلاب للمدرس معين مع عرض بياناته
-    public function index(Teacher $teacher)
-    {
-        // جلب الطلاب المرتبطين بالمدرس مع إمكانية التصفية أو البحث مستقبلاً
-        $students = Student::where('teacher_id', $teacher->id)->paginate(15);
+public function index(Teacher $teacher)
+{
+    // جلب الطلاب المرتبطين بالمدرس من خلال العلاقة many-to-many
+    $students = $teacher->students()->paginate(15);
 
+    return view('students.index', compact('teacher', 'students'));
+}
 
-        return view('students.index', compact('teacher', 'students'));
-    }
 
     // عرض نموذج إنشاء طالب جديد
     public function create(Teacher $teacher)
@@ -25,26 +25,28 @@ class StudentController extends Controller
     }
 
     // تخزين الطالب الجديد
-    public function store(Request $request, Teacher $teacher)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'parent_name' => 'required|string|max:255',
-            'parent_phone' => 'required|string|max:20',
-            'subject_id' => 'required|exists:subjects,id',
-            'grade_id' => 'required|exists:grades,id',
-            'group_id' => 'nullable|exists:groups,id',
-        ]);
+public function store(Request $request, Teacher $teacher)
+{
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'phone' => 'required|string|max:20',
+        'parent_name' => 'required|string|max:255',
+        'parent_phone' => 'required|string|max:20',
+        'subject_id' => 'required|exists:subjects,id',
+        'grade_id' => 'required|exists:grades,id',
+        'group_id' => 'nullable|exists:groups,id',
+    ]);
 
-        // إضافة teacher_id
-        $data['teacher_id'] = $teacher->id;
+    // إنشاء الطالب بدون teacher_id
+    $student = Student::create($data);
 
-        Student::create($data);
+    // ربط الطالب بالمدرس عبر جدول student_teacher
+    $teacher->students()->attach($student->id);
 
-        return redirect()->route('teachers.students.index', $teacher->id)
-                         ->with('success', 'تم إضافة الطالب بنجاح');
-    }
+    return redirect()->route('teachers.students.index', $teacher->id)
+                     ->with('success', 'تم إضافة الطالب وربطه بالمدرس بنجاح');
+}
+
 
     // عرض بيانات طالب معين
     public function show(Teacher $teacher, Student $student)

@@ -21,10 +21,15 @@ class Student extends Authenticatable
         return $this->belongsTo(Teacher::class);
     }
 
-    public function parent()
-    {
-        return $this->belongsTo(ParentModel::class, 'parent_id');
-    }
+
+public function parent()
+{
+    return $this->belongsTo(ParentModel::class, 'parent_id'); // أو 'parent_id' حسب العمود
+}
+public function teachers()
+{
+    return $this->belongsToMany(Teacher::class, 'student_teacher');
+}
 
     public function subjects()
     {
@@ -40,17 +45,35 @@ public function group()
 {
     return $this->belongsTo(Group::class);
 }
+public function lectures()
+{
+    return $this->belongsToMany(Lecture::class, 'lecture_student');
+}
+
 
 public function appointments()
 {
     return $this->hasMany(Appointment::class);
 }
 
+
 // Student.php
 public function grade()
 {
     return $this->belongsTo(SchoolGrade::class, 'school_grade_id');
 }
+
+
+
+
+
+
+
+public function subject()
+{
+    return $this->belongsTo(Subject::class);
+}
+
 
 
 

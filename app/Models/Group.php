@@ -33,5 +33,11 @@ public function schoolGrade()
     return $this->belongsTo(SchoolGrade::class, 'grade_id');  // أو 'school_grade_id'
 }
 
+public function lectures()
+{
+    return $this->hasMany(Lecture::class);
+}
+
+
 }
 

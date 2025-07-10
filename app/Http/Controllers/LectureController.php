@@ -11,9 +11,11 @@ class LectureController extends Controller
     public function index($teacher_id)
     {
         $teacher = Teacher::findOrFail($teacher_id);
-        $lectures = $teacher->lectures()->latest()->paginate(10);
+        $groupIds = $teacher->groups()->pluck('id');
 
-        return view('lectures.index', compact('teacher', 'lectures'));
+$lectures = Lecture::whereIn('group_id', $groupIds)->latest()->paginate(10);
+
+        return view('lectures.index', compact('teacher', 'lectures', 'groupIds'));
     }
 
     public function create($teacher_id)
@@ -21,21 +23,27 @@ class LectureController extends Controller
         $teacher = Teacher::findOrFail($teacher_id);
         return view('lectures.create', compact('teacher'));
     }
+public function store(Request $request, $teacher_id)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'start_time' => 'required|date',
+        'end_time' => 'required|date|after:start_time',
+        'group_id' => 'required|exists:groups,id',
+    ]);
 
-    public function store(Request $request, $teacher_id)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
-        ]);
+    Lecture::create([
+        'group_id' => $request->group_id,
+        'title' => $request->title,
+        'description' => $request->description,
+        'start_time' => $request->start_time,
+        'end_time' => $request->end_time,
+    ]);
 
-        $teacher = Teacher::findOrFail($teacher_id);
-        $teacher->lectures()->create($request->all());
+    return redirect()->route('lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرة بنجاح.');
+}
 
-        return redirect()->route('lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرة بنجاح.');
-    }
 
     public function edit($teacher_id, Lecture $lecture)
     {
@@ -62,4 +70,25 @@ class LectureController extends Controller
         $lecture->delete();
         return redirect()->route('lectures.index', $teacher_id)->with('success', 'تم حذف المحاضرة.');
     }
+
+
+
+    public function storeMultiple(Request $request, $teacher_id)
+{
+    $validated = $request->validate([
+        'lectures' => 'required|array|min:1',
+        'lectures.*.group_id' => 'required|exists:groups,id',
+        'lectures.*.title' => 'required|string|max:255',
+        'lectures.*.description' => 'nullable|string',
+        'lectures.*.start_time' => 'required|date',
+        'lectures.*.end_time' => 'required|date|after:lectures.*.start_time',
+    ]);
+
+    foreach ($validated['lectures'] as $lectureData) {
+        Lecture::create($lectureData);
+    }
+
+    return redirect()->route('lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرات بنجاح.');
+}
+
 }

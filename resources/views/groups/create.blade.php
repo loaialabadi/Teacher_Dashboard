@@ -47,17 +47,7 @@
             </select>
         </div>
 
-        <div class="mb-3">
-            <label for="lecture_id" class="form-label">اختر الحصة (المحاضرة)</label>
-            <select class="form-control" id="lecture_id" name="lecture_id" required>
-                <option value="">-- اختر --</option>
-                @foreach($lectures as $lecture)
-                    <option value="{{ $lecture->id }}" {{ old('lecture_id') == $lecture->id ? 'selected' : '' }}>
-                        {{ $lecture->title }} ({{ $lecture->start_time }} - {{ $lecture->end_time }})
-                    </option>
-                @endforeach
-            </select>
-        </div>
+
 
         <div class="mb-3">
             <label class="form-label">اختر الطلاب</label>

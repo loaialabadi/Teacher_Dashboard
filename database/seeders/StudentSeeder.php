@@ -4,41 +4,42 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Grade;
+use App\Models\Student;
+use App\Models\ParentModel;
+use App\Models\Teacher;
+
 class StudentSeeder extends Seeder
 {
-    public function run(): void
-    {
-        $parents = \App\Models\ParentModel::all();
-        $teachers = \App\Models\Teacher::all();
-        $grades = Grade::all();  // << غيرت هنا من $classId إلى $grades
+public function run(): void
+{
+    $parents  = ParentModel::all();
+    $teachers = Teacher::all();
+    $grades   = Grade::all();
 
-        if ($parents->isEmpty() || $teachers->isEmpty() || $grades->isEmpty()) {
-            $this->command->error('تأكد من وجود بيانات للآباء، المدرسين، والفصول قبل تشغيل Seeder الطلاب.');
-            return;
-        }
-
-        $this->command->info('الفصول الموجودة: ' . $grades->pluck('id')->implode(', '));
-        $this->command->info('الآباء الموجودون: ' . $parents->pluck('id')->implode(', '));
-        $this->command->info('المدرسون الموجودون: ' . $teachers->pluck('id')->implode(', '));
-
-        \App\Models\Student::factory(20)->make()->each(function ($student) use ($parents, $teachers, $grades) {
-            
-            // اختيار قيم عشوائية
-            $student->parent_id = $parents->random()->id;
-            $student->teacher_id = $teachers->random()->id;
-            $student->class_id = $grades->random()->id;
-
-            // تحقق من وجود القيم قبل الحفظ
-            if (
-                $parents->where('id', $student->parent_id)->count() > 0 &&
-                $teachers->where('id', $student->teacher_id)->count() > 0 &&
-                $grades->where('id', $student->class_id)->count() > 0
-            ) {
-                $this->command->info("إنشاء طالب مرتبط بالفصل {$student->class_id}");
-                $student->save();
-            } else {
-                $this->command->error("خطأ: parent_id أو teacher_id أو class_id غير موجودة.");
-            }
-        });
+    if ($parents->isEmpty() || $teachers->isEmpty() || $grades->isEmpty()) {
+        $this->command->error('❌ تأكد من وجود بيانات في جداول الآباء، المدرسين، والفصول الدراسية قبل تشغيل Seeder الطلاب.');
+        return;
     }
+
+    $this->command->info('📚 الفصول الدراسية: ' . $grades->pluck('id')->implode(', '));
+    $this->command->info('👨‍👩‍👧‍👦 الآباء: ' . $parents->pluck('id')->implode(', '));
+    $this->command->info('👨‍🏫 المدرسون: ' . $teachers->pluck('id')->implode(', '));
+
+    // هنا استخدم create() وليس make()
+    Student::factory(20)->create()->each(function ($student) use ($parents, $teachers, $grades) {
+        $student->update([
+            'parent_id' => $parents->random()->id,
+            'grade_id'  => $grades->random()->id,
+        ]);
+
+        $randomTeachers = $teachers->random(rand(1, 3));
+        $student->teachers()->attach($randomTeachers->pluck('id'));
+
+        $teacherNames = $randomTeachers->pluck('name')->implode(', ');
+        $this->command->info("✅ الطالب {$student->name} تم ربطه بـ: {$teacherNames}");
+    });
+
+    $this->command->info('🎉 تم إنشاء وربط الطلاب بنجاح.');
+}
+
 }

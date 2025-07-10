@@ -17,11 +17,12 @@ public function subject()
     return $this->belongsTo(Subject::class);
 }
 
+
+
 public function students()
 {
-    return $this->hasMany(Student::class);
+    return $this->belongsToMany(Student::class, 'student_teacher');
 }
-
 
 protected static function booted()
 {
@@ -34,6 +35,9 @@ protected static function booted()
     {
         return $this->hasMany(Appointment::class);
     }
+
+
+
 
   public function groups()
 {

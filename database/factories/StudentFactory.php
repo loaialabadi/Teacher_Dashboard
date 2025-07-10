@@ -18,7 +18,6 @@ class StudentFactory extends Factory
             'name' => $this->faker->name,
             'phone' => '01' . $this->faker->numberBetween(100000000, 999999999),
             'parent_id' => ParentModel::inRandomOrder()->first()?->id ?? ParentModel::factory(),
-            'teacher_id' => Teacher::inRandomOrder()->first()?->id ?? Teacher::factory(),
             'grade_id' => Grade::inRandomOrder()->first()?->id ?? Grade::factory(),
         ];
     }

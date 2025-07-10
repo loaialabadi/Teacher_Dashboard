@@ -16,12 +16,10 @@ return new class extends Migration {
             $table->foreignId('grade_id')->nullable()->constrained('grades')->onDelete('cascade');
 
             $table->unsignedBigInteger('parent_id')->nullable();
-            $table->unsignedBigInteger('teacher_id')->nullable();  // ربط الطالب بالمعلم
 
             // المفاتيح الأجنبية الأخرى
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('parent_id')->references('id')->on('parents')->onDelete('set null');
-            $table->foreign('teacher_id')->references('id')->on('teachers')->onDelete('set null');
 
             $table->timestamps();
         });

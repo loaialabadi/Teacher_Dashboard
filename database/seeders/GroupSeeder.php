@@ -23,7 +23,7 @@ class GroupSeeder extends Seeder
             Group::create([
                 'name' => 'مجموعة ' . $i,
                 'teacher_id' => $teachers->random()->id,
-'school_grade_id' => $grades->random()->id,
+'grade_id' => $grades->random()->id,
 
             ]);
         }
