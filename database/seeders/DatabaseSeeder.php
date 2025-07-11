@@ -31,6 +31,9 @@ class DatabaseSeeder extends Seeder
             GradeSeeder::class,
         ]);
 
+                $this->call([
+            SubjectSeeder::class,
+        ]);
         // 4. ننشئ بيانات الطلاب مع الربط بالآباء والمعلمين والفصول
         $this->call([
             StudentSeeder::class,
@@ -48,9 +51,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 7. ننشئ بيانات المواد الدراسية
-        $this->call([
-            SubjectSeeder::class,
-        ]);
+
+
+        $this->call(StudentTeacherSeeder::class);
 
         // 8. ربط المعلم مع فصل معين (GradeTeacher)
         $someTeacherId = Teacher::inRandomOrder()->first()->id;

@@ -33,8 +33,9 @@
                 <tr>
                     <td>{{ $student->name }}</td>
                     <td>{{ $student->phone }}</td>
-                    <td>{{ $student->parent_name }}</td>
-                    <td>{{ $student->parent_phone }}</td>
+        <td>{{ $student->parent->name ?? '-' }}</td>
+        <td>{{ $student->parent->phone ?? '-' }}</td>
+
                     <td>{{ $student->subject->name ?? '-' }}</td>
                     <td>{{ $student->grade->name ?? '-' }}</td>
                     <td>{{ $student->group->name ?? '-' }}</td>
@@ -52,7 +53,6 @@
             </tbody>
         </table>
 
-        {{ $students->links() }} {{-- pagination --}}
     @else
         <div class="alert alert-info">لا يوجد طلاب مسجلين حتى الآن.</div>
     @endif

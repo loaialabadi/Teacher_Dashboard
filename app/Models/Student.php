@@ -8,6 +8,7 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\ParentModel;
+use App\Models\Grade;
 class Student extends Authenticatable
 {
     use HasApiTokens, HasFactory;
@@ -26,10 +27,7 @@ public function parent()
 {
     return $this->belongsTo(ParentModel::class, 'parent_id'); // أو 'parent_id' حسب العمود
 }
-public function teachers()
-{
-    return $this->belongsToMany(Teacher::class, 'student_teacher');
-}
+
 
     public function subjects()
     {
@@ -64,17 +62,47 @@ public function grade()
 }
 
 
-
-
-
-
-
 public function subject()
 {
     return $this->belongsTo(Subject::class);
 }
 
 
+
+
+
+
+
+
+// في موديل Student
+public function studentTeacher()
+{
+    return $this->hasMany(StudentTeacher::class, 'student_id');
+}
+
+
+
+
+
+
+public function groupStudents()
+{
+    return $this->hasMany(GroupStudent::class);
+}
+
+public function teachers()
+{
+    return $this->belongsToMany(Teacher::class, 'student_teacher')
+                ->withPivot('subject_id')
+                ->withTimestamps();
+}
+
+
+
+public function grades()
+{
+    return $this->belongsToMany(Grade::class, 'student_grade'); // مثال
+}
 
 
 }

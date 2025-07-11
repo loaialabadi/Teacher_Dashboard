@@ -38,6 +38,16 @@ public function lectures()
     return $this->hasMany(Lecture::class);
 }
 
+public function subject()
+{
+    return $this->belongsTo(Subject::class);
+}
+
+public function grade()
+{
+    return $this->belongsTo(Grade::class);
+}
+
 
 }
 

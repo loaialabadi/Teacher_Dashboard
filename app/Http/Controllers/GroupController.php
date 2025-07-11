@@ -10,6 +10,7 @@ use App\Models\Lecture;
 use App\Models\Grade;
 use Illuminate\Http\Request;
 
+
 class GroupController extends Controller
 {
   public function index(Teacher $teacher)
@@ -23,7 +24,7 @@ class GroupController extends Controller
     public function create($teacherId)
     {
         $teacher = Teacher::findOrFail($teacherId);
-        $students = Student::all();
+$students = $teacher->students; // أو $teacher->students()->get();
         $subjects = $teacher->subjects; // المواد المرتبطة بالمدرس
         $grades = $teacher->grades; // الفصول المرتبطة بالمدرس
 $groupIds = $teacher->groups()->pluck('id');

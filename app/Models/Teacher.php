@@ -21,8 +21,11 @@ public function subject()
 
 public function students()
 {
-    return $this->belongsToMany(Student::class, 'student_teacher');
+    return $this->belongsToMany(Student::class, 'student_teacher')
+                ->withPivot('subject_id')
+                ->withTimestamps();
 }
+
 
 protected static function booted()
 {

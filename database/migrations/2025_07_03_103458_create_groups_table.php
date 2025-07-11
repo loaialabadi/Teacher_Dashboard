@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->foreignId('grade_id')->nullable()->constrained('grades')->onDelete('set null');
 
             $table->timestamps();
+    $table->foreignId('subject_id')->nullable()->constrained('subjects')->onDelete('set null');
 
 
             $table->foreign('teacher_id')->references('id')->on('teachers')->onDelete('cascade');

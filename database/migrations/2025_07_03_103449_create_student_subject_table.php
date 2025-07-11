@@ -14,7 +14,7 @@ return new class extends Migration {
 
             $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
             $table->foreign('subject_id')->references('id')->on('subjects')->onDelete('cascade');
-
+            $table->foreignId('grade_id')->nullable()->constrained('grades')->onDelete('cascade');
             $table->unique(['student_id', 'subject_id']);
         });
     }

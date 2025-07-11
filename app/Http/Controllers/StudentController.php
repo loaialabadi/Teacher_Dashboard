@@ -5,18 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use App\Models\GroupStudent;
+use App\Models\ParentModel; // عدل الاسم حسب موديل ولي الأمر عندك
 
+use App\Models\Group;
 class StudentController extends Controller
 {
     // عرض كل الطلاب للمدرس معين مع عرض بياناته
+
+
 public function index(Teacher $teacher)
 {
-    // جلب الطلاب المرتبطين بالمدرس من خلال العلاقة many-to-many
-    $students = $teacher->students()->paginate(15);
-
+$students = Student::with(['parent', 'studentTeacher.subject', 'groups'])
+    ->whereHas('groups', function($query) use ($teacher) {
+        $query->where('teacher_id', $teacher->id);
+    })->get();
+        // dd($students);
     return view('students.index', compact('teacher', 'students'));
 }
-
 
     // عرض نموذج إنشاء طالب جديد
     public function create(Teacher $teacher)
@@ -25,6 +31,7 @@ public function index(Teacher $teacher)
     }
 
     // تخزين الطالب الجديد
+
 public function store(Request $request, Teacher $teacher)
 {
     $data = $request->validate([
@@ -37,15 +44,46 @@ public function store(Request $request, Teacher $teacher)
         'group_id' => 'nullable|exists:groups,id',
     ]);
 
-    // إنشاء الطالب بدون teacher_id
-    $student = Student::create($data);
+    $parent = ParentModel::firstOrCreate(
+        ['phone' => $data['parent_phone']],
+        [
+            'name' => $data['parent_name'],
+            'password' => bcrypt('defaultpassword123'),
+        ]
+    );
 
-    // ربط الطالب بالمدرس عبر جدول student_teacher
-    $teacher->students()->attach($student->id);
+    $student = Student::create([
+        'name' => $data['name'],
+        'phone' => $data['phone'],
+        'grade_id' => $data['grade_id'],
+        'parent_id' => $parent->id,
+    ]);
+
+    $teacher->students()->attach($student->id, [
+        'subject_id' => $data['subject_id'],
+        'grade_id' => $data['grade_id'],
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    
+
+    if ($data['group_id']) {
+        $student->groups()->attach($data['group_id']);
+    } else {
+        $group = Group::firstOrCreate([
+            'teacher_id' => $teacher->id,
+            'subject_id' => $data['subject_id'],
+            'grade_id' => $data['grade_id'],
+        ]);
+        $student->groups()->attach($group->id);
+    }
 
     return redirect()->route('teachers.students.index', $teacher->id)
-                     ->with('success', 'تم إضافة الطالب وربطه بالمدرس بنجاح');
+                     ->with('success', 'تم إضافة الطالب وربطه بالمدرس وولي الأمر بنجاح');
 }
+
+
 
 
     // عرض بيانات طالب معين
