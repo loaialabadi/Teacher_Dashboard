@@ -9,12 +9,12 @@ return new class extends Migration {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('student_id');
-            $table->unsignedBigInteger('appointment_id'); // الحصة أو الموعد
+            $table->unsignedBigInteger('lecture_id'); // ربط الحضور بالمحاضرة
             $table->enum('status', ['present', 'absent', 'late'])->default('present');
             $table->timestamps();
 
             $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
-            $table->foreign('appointment_id')->references('id')->on('appointments')->onDelete('cascade');
+            $table->foreign('lecture_id')->references('id')->on('lectures')->onDelete('cascade');
         });
     }
 

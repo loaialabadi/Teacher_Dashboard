@@ -74,6 +74,11 @@
       <a href="{{ url()->previous() }}" class="btn btn-outline-primary mb-3">
     <i class="fas fa-arrow-left"></i> الرجوع
   </a>
+
+
+
+
+
     @yield('content')
 
   </div>

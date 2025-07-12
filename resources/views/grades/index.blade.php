@@ -17,32 +17,44 @@
             <thead>
                 <tr>
                     <th>اسم الفصل</th>
-                    <th>المادة</th>
                     <th>التاريخ</th>
-                    <th>الوصف</th>
                     <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
-@foreach($grades as $grade)
-    <tr>
-        <td>{{ $grade->name ?? '-' }}</td>
-        <td>{{ $grade->subject->name ?? '-' }}</td>
-        <td>{{ \Carbon\Carbon::parse($grade->date)->format('Y-m-d') }}</td>
-        <td>{{ $grade->description ?? '-' }}</td>
-        <td>
-<a href="{{ route('grades.edit', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-sm btn-primary">
-    تعديل
-</a>
-        </td>
-    </tr>
-@endforeach
+                @foreach($grades as $grade)
+                    <tr>
+                        <td>{{ $grade->name ?? '-' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($grade->date)->format('Y-m-d') }}</td>
+                        <td>
+                            <a href="{{ route('grades.edit', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> تعديل
+                            </a>
 
+                            <form action="{{ route('grades.destroy', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد من حذف هذا الفصل الدراسي؟')">
+                                    <i class="fas fa-trash"></i> حذف
+                                </button>
+                            </form>
+
+<a href="{{ route('show_students', ['teacher' => $teacher->id]) }}" class="btn btn-info">
+    <i class="fas fa-check-circle"></i> عرض الطلاب 
+</a>
+
+
+
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
 
-        {{ $grades->links() }}
-
+        {{-- روابط التصفح --}}
+        <div class="mt-3">
+            {{ $grades->links() }}
+        </div>
     @else
         <p>لا توجد فصول دراسية لهذا المعلم حتى الآن.</p>
     @endif

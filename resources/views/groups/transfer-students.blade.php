@@ -18,15 +18,15 @@
             </select>
         </div>
 
-        <h4>اختر الطلاب للنقل:</h4>
+        <h4 class="mt-4">اختر الطلاب للنقل:</h4>
         <div class="list-group mb-3" style="max-height: 400px; overflow-y: auto;">
             @foreach ($students as $student)
                 <label class="list-group-item">
                     <input type="checkbox" name="student_ids[]" value="{{ $student->id }}" 
-                        @if($student->group_id == $sourceGroup->id) checked @endif>
+                        {{ $student->groups->contains($sourceGroup->id) ? 'checked' : '' }}>
                     {{ $student->name }} - {{ $student->phone }}
-                    @if($student->group)
-                        <small class="text-muted">(في مجموعة: {{ $student->group->name }})</small>
+                    @if($student->groups->isNotEmpty())
+                        <small class="text-muted">(في مجموعات: {{ $student->groups->pluck('name')->join(', ') }})</small>
                     @endif
                 </label>
             @endforeach

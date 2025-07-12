@@ -10,7 +10,12 @@ class Group extends Model
 {
         use HasFactory;
 
-    protected $fillable = ['name', 'teacher_id'];
+protected $fillable = [
+    'name',
+    'teacher_id',
+    'subject_id',
+    'grade_id',
+];
 
     public function appointments()
     {

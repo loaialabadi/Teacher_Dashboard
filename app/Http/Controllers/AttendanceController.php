@@ -2,51 +2,132 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ClassModel;
-use App\Models\Attendance;
+use App\Models\Lecture;
 use App\Models\Student;
+use App\Models\Attendance;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
-use App\Notifications\AttendanceNotification;
-
-use App\Models\Appointment;
+use App\Models\Teacher;
+use App\Models\Group;
 
 class AttendanceController extends Controller
 {
-    // صفحة عرض الطلاب للحصة مع اختيار الحضور والغياب
-    public function markAttendanceForm(Appointment $appointment)
+    // 1. عرض جميع سجلات الحضور الخاصة بمعلم معين
+    public function index($teacherId)
     {
-        $students = $appointment->teacher->students;
+        $teacher = Teacher::findOrFail($teacherId);
 
-        // استدعاء الحضور السابق إذا موجود (تعديل)
-        $attendances = Attendance::where('appointment_id', $appointment->id)
-                        ->get()->keyBy('student_id');
+        // جلب حضور الطلاب المرتبطين بمحاضرات مجموعات هذا المعلم
+        $attendances = Attendance::whereHas('lecture.group', function($q) use ($teacherId) {
+            $q->where('teacher_id', $teacherId);
+        })->get();
 
-        return view('attendance.mark', compact('appointment', 'students', 'attendances'));
+        return view('attendance.index', compact('teacher', 'attendances'));
     }
 
-    // حفظ الحضور
-    public function saveAttendance(Request $request, Appointment $appointment)
+    // 2. عرض نموذج تسجيل الحضور والغياب لمحاضرة معينة
+    public function create(Lecture $lecture)
+    {
+        $students = $lecture->group->students;
+        $teacher = $lecture->group->teacher;
+
+        $attendances = Attendance::where('lecture_id', $lecture->id)->get()->keyBy('student_id');
+
+        return view('attendance.create', compact('lecture', 'students', 'attendances', 'teacher'));
+    }
+
+    // 3. حفظ بيانات الحضور والغياب لمجموعة (تستخدم عند اختيار مجموعة)
+    public function storeForGroup(Request $request, Group $group)
     {
         $request->validate([
-            'attendance' => 'required|array',
-            'attendance.*' => 'in:present,absent',
+            'statuses' => 'required|array',
+            'statuses.*' => 'in:present,absent,late',
         ]);
 
-        foreach ($request->attendance as $studentId => $status) {
+        $lecture = $group->lectures()->latest()->first();
+
+        if (!$lecture) {
+            return back()->with('error', 'لا توجد محاضرة مرتبطة بهذه المجموعة.');
+        }
+
+        foreach ($request->statuses as $studentId => $status) {
             Attendance::updateOrCreate(
-                [
-                    'student_id' => $studentId,
-                    'appointment_id' => $appointment->id,
-                ],
-                [
-                    'status' => $status,
-                    'attended_at' => $appointment->scheduled_at,
-                ]
+                ['lecture_id' => $lecture->id, 'student_id' => $studentId],
+                ['status' => $status]
             );
         }
 
-        return redirect()->route('appointments.index', $appointment->teacher->id)
-                         ->with('success', 'تم تسجيل الحضور بنجاح');
+        return redirect()->route('teachers.groups.attendance.index', ['teacher' => $group->teacher_id, 'group' => $group->id])
+            ->with('success', 'تم تسجيل الحضور بنجاح.');
+    }
+
+    // 4. حفظ بيانات الحضور والغياب لمحاضرة معينة (تستخدم عند اختيار محاضرة)
+public function storeForLecture(Request $request, Teacher $teacher, Lecture $lecture)
+    {
+        $request->validate([
+            'statuses' => 'required|array',
+            'statuses.*' => 'in:present,absent,late',
+        ]);
+
+        foreach ($request->statuses as $studentId => $status) {
+            Attendance::updateOrCreate(
+                ['lecture_id' => $lecture->id, 'student_id' => $studentId],
+                ['status' => $status]
+            );
+        }
+
+        return redirect()->route('attendances.create', $lecture->id)->with('success', 'تم تسجيل الحضور بنجاح.');
+    }
+
+    // 5. عرض تقرير الحضور لمحاضرة معينة
+        public function report(Teacher $teacher, Lecture $lecture)
+        
+        {
+                // dd($lecture); // هنا ستعرف ما هي القيمة التي تصل للباراميتر
+
+            $attendances = Attendance::where('lecture_id', $lecture->id)->with('student')->get();
+
+            return view('attendance.report', compact('lecture', 'attendances'));
+        }
+
+    // 6. عرض نموذج تعديل حضور طالب معين لمحاضرة معينة
+    public function edit(Lecture $lecture, Student $student)
+    {
+        $attendance = Attendance::where('lecture_id', $lecture->id)
+            ->where('student_id', $student->id)
+            ->firstOrFail();
+
+        return view('attendances.edit', compact('lecture', 'student', 'attendance'));
+    }
+
+    // 7. تحديث حالة حضور طالب معين في محاضرة معينة
+    public function update(Request $request, Lecture $lecture, Student $student)
+    {
+        $request->validate([
+            'status' => 'required|in:present,absent,late',
+        ]);
+
+        $attendance = Attendance::where('lecture_id', $lecture->id)
+            ->where('student_id', $student->id)
+            ->firstOrFail();
+
+        $attendance->status = $request->status;
+        $attendance->save();
+
+        return redirect()->route('attendances.report', $lecture->id)->with('success', 'تم تحديث حالة الحضور.');
+    }
+
+    // 8. عرض الحضور لمجموعة معينة تحت معلم معين
+    public function groupAttendance($teacherId, $groupId)
+    {
+        $teacher = Teacher::findOrFail($teacherId);
+        $group = Group::with('students')->findOrFail($groupId);
+
+        $attendances = Attendance::whereHas('lecture', function($query) use ($groupId) {
+            $query->where('group_id', $groupId);
+        })->get();
+
+        $lectures = Lecture::where('group_id', $groupId)->get();
+
+        return view('attendance.index', compact('teacher', 'group', 'lectures', 'attendances'));
     }
 }

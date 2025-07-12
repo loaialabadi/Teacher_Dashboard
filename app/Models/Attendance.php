@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attendance extends Model
 {
-    protected $table = 'attendance';
+    protected $table = 'attendances';
 
-    protected $fillable = ['class_id', 'student_id', 'status', 'attended_at'];
+protected $fillable = ['lecture_id', 'student_id', 'status'];
 
     public function student()
     {
@@ -25,5 +25,15 @@ class Attendance extends Model
     {
         return $this->belongsTo(Appointment::class);
     }
+
+
+    // ...
+
+    public function lecture()
+    {
+        return $this->belongsTo(Lecture::class);
+    }
+
 }
+
 

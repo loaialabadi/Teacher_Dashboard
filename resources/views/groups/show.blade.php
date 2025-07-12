@@ -7,8 +7,12 @@
     <div class="mb-3">
         <strong>اسم المدرس:</strong> {{ $teacher->name }}
     </div>
-
+    <div class="mb-3">
+<strong>الفصل الدراسي :</strong> {{ $group->grade->name ?? 'غير محدد' }}
     <div class="mb-4">
+
+        <strong>المادة:</strong> {{ $group->subject->name ?? 'غير محدد' }}
+    </div>
         <strong>عدد الطلاب:</strong> {{ $group->students->count() }}
     </div>
 

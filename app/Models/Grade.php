@@ -28,4 +28,6 @@ class Grade extends Model
         // مثلاً كل فصل دراسي (Grade) مرتبط بمادة واحدة (Subject)
         return $this->belongsTo(Subject::class);
     }
+
+    
 }

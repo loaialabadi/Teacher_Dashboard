@@ -4,26 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Teacher;
 use App\Models\Subject;
+use App\Models\Lecture;
 use Illuminate\Http\Request;
-use App\Models\Appointment;
+
 class TeachersController extends Controller
 {
-    // عرض جميع المعلمين مع المادة الخاصة بهم
+    // ✅ عرض جميع المعلمين مع المادة الخاصة بهم
     public function index()
     {
-        
-        $teachers = Teacher::with('subject')->get();
+        $teachers = Teacher::with('subject', 'groups')->get();
         return view('teachers.index', compact('teachers'));
     }
 
-    // عرض نموذج إضافة معلم جديد
+    // ✅ عرض نموذج إضافة معلم جديد
     public function create()
     {
         $subjects = Subject::all();
         return view('teachers.create', compact('subjects'));
     }
 
-    // تخزين معلم جديد مع التحقق من البيانات
+    // ✅ تخزين معلم جديد مع التحقق من البيانات
     public function store(Request $request)
     {
         $request->validate([
@@ -41,14 +41,14 @@ class TeachersController extends Controller
         }
     }
 
-    // عرض نموذج تعديل معلم محدد
+    // ✅ عرض نموذج تعديل معلم محدد
     public function edit(Teacher $teacher)
     {
         $subjects = Subject::all();
         return view('teachers.edit', compact('teacher', 'subjects'));
     }
 
-    // تحديث بيانات معلم محدد مع التحقق من البيانات
+    // ✅ تحديث بيانات معلم محدد
     public function update(Request $request, $id)
     {
         $teacher = Teacher::findOrFail($id);
@@ -57,7 +57,7 @@ class TeachersController extends Controller
             'name'       => 'required|string|max:255',
             'email'      => 'required|email|unique:teachers,email,' . $teacher->id,
             'phone'      => 'nullable|string|max:20',
-            'subject_id' => 'required|exists:subjects,id',  // أضفت تحقق للمادة هنا (مهم)
+            'subject_id' => 'required|exists:subjects,id',
         ]);
 
         $teacher->update($request->only(['name', 'email', 'phone', 'subject_id']));
@@ -65,43 +65,40 @@ class TeachersController extends Controller
         return redirect()->route('teachers.index')->with('success', 'تم تحديث بيانات المعلم بنجاح.');
     }
 
-    // حذف معلم محدد
+    // ✅ حذف معلم
     public function destroy(Teacher $teacher)
     {
         $teacher->delete();
-
         return redirect()->route('teachers.index')->with('success', 'تم حذف المعلم بنجاح');
     }
 
+    // ✅ لوحة تحكم المعلم
+    public function dashboard($id)
+    {
+        $teacher = Teacher::with(['students', 'lectures', 'groups'])->findOrFail($id);
 
-public function dashboard($id)
-{
-    $teacher = Teacher::with('students', 'appointments', 'groups')->findOrFail($id);
+        $group = $teacher->groups->first(); // جلب أول مجموعة
+        $groupId = $group ? $group->id : null;
 
-    $group = $teacher->groups()->first(); // جلب أول مجموعة للمعلم
-    $groupId = $group ? $group->id : null;
-    
-$appointments = Appointment::where('teacher_id', $teacher->id)
-    ->orderBy('start_time', 'asc')
-    ->get();
+        $lectures = $teacher->lectures->sortBy('start_time'); // ترتيب الحصص
 
-    return view('teacher.dashboard', compact('teacher', 'appointments', 'groupId'));
-}
+        return view('teacher.dashboard', compact('teacher', 'lectures', 'groupId'));
+    }
 
-public function showAppointments($teacherId)
-{
-    // جلب المعلم مع الحصص والطلاب المرتبطين
-    $teacher = Teacher::with('appointments.student')->findOrFail($teacherId);
+    // ✅ عرض الحصص الخاصة بالمعلم
+    public function showlectures($teacherId)
+    {
+        $teacher = Teacher::with(['lectures.student', 'groups'])->findOrFail($teacherId);
 
-    // جلب الحصص مع ترتيبها
-    $appointments = $teacher->appointments()->orderBy('appointment_date')->orderBy('appointment_time')->get();
+        $lectures = $teacher->lectures()->orderBy('lecture_date')->orderBy('lecture_time')->get();
 
-    $groupId = $groups->first()?->id;
+        $groupId = $teacher->groups->first()?->id;
 
-    // عرض الصفحة وتمرير البيانات
-    return view('teachers.dashboard', compact('teacher', 'groups', 'groupId'));
-}
-
-
-
+        return view('teachers.dashboard', [
+            'teacher' => $teacher,
+            'lectures' => $lectures,
+            'groups' => $teacher->groups,
+            'groupId' => $groupId,
+        ]);
+    }
 }

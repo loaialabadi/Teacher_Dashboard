@@ -27,9 +27,15 @@
                     <a href="{{ route('groups.add-student', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="btn btn-outline-success btn-sm">
                         <i class="fas fa-user-plus"></i> إضافة طالب
                     </a>
+<a href="{{ route('teachers.groups.attendance.index', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="btn btn-primary">
+    <i class="fas fa-user-check"></i> حضور وغياب المجموعة
+</a>
+
+
                 </div>
             </div>
         </div>
+        
     @empty
         <div class="alert alert-info text-center">
             لا توجد مجموعات بعد لهذا المعلم.
@@ -37,4 +43,7 @@
     @endforelse
 
 </div>
+
+
+
 @endsection

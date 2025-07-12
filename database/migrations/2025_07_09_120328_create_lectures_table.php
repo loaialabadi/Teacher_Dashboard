@@ -15,6 +15,8 @@ Schema::create('lectures', function (Blueprint $table) {
     $table->id();
     $table->foreignId('group_id')->constrained()->onDelete('cascade'); // المحاضرة مرتبطة بالمجموعة
     $table->string('title');
+    $table->foreignId('teacher_id')->constrained()->onDelete('cascade');
+
     $table->text('description')->nullable();
     $table->dateTime('start_time');
     $table->dateTime('end_time');

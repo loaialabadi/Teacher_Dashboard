@@ -85,6 +85,8 @@ public function store(Request $request, $teacher_id)
     ]);
 
     foreach ($validated['lectures'] as $lectureData) {
+                $lectureData['teacher_id'] = $teacher_id;  // أضف هذا السطر
+
         Lecture::create($lectureData);
     }
 

@@ -8,7 +8,7 @@ use App\Models\Teacher;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Group;
-use App\Models\Appointment;
+use App\Models\Lecture;
 use App\Models\Subject;
 use App\Models\GradeTeacher;
 
@@ -45,9 +45,9 @@ class DatabaseSeeder extends Seeder
             GroupStudentSeeder::class,
         ]);
 
-        // 6. ننشئ بيانات المواعيد (Appointments)
+        // 6. ننشئ بيانات المواعيد (Lectures)
         $this->call([
-            AppointmentSeeder::class,
+            LectureSeeder::class,
         ]);
 
         // 7. ننشئ بيانات المواد الدراسية

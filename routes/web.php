@@ -8,13 +8,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ParentController;
-use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\SchoolGradeController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\LectureController;
+
 
 // الصفحة الرئيسية
 Route::get('/', function () {
@@ -47,6 +47,9 @@ Route::get('/students/{student}/schedule-groups', [StudentController::class, 'sc
 Route::get('appointments/{appointment}/attendance', [AttendanceController::class, 'markAttendanceForm'])->name('attendance.mark');
 Route::post('appointments/{appointment}/attendance', [AttendanceController::class, 'saveAttendance'])->name('attendance.save');
 
+
+Route::get('/teacher/{teacher}', [TeacherController::class, 'dashboard'])->name('teacher.dashboard');
+
 // كل ما يخص المدرس بمجموعاته وطلابه ودرجاته ومحاضراته داخل Prefix واحد
 Route::prefix('teachers/{teacher}')->group(function () {
 
@@ -78,8 +81,9 @@ Route::prefix('teachers/{teacher}')->group(function () {
     // الطلاب
     Route::resource('students', StudentController::class);
 
-    // الدرجات
-    Route::resource('grades', GradeController::class);
+
+
+
 
     // المواد
     Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
@@ -117,8 +121,58 @@ Route::prefix('teachers/{teacher}')->group(function () {
     Route::post('/lectures/multiple', [LectureController::class, 'storeMultiple'])->name('lectures.storeMultiple');
 });
 
+
+
+
+
+    Route::resource('grades', GradeController::class);
+
+
+
+
+Route::post('teachers/{teacher}/grades', [GradeController::class, 'store'])->name('teachers.grades.store');
+
+Route::resource('grades', GradeController::class);
+
+
+
+Route::resource('grades', GradeController::class)->except(['index', 'store', 'create']); // إذا تم التحكم فيهم داخل المعلم
+
+
+
+
+
+
+
+
+Route::get('lectures/{lecture}/attendance/create', [AttendanceController::class, 'create'])->name('attendances.create');
+Route::post('lectures/{lecture}/attendance', [AttendanceController::class, 'store'])->name('attendances.store');
+
 // موارد العلاقة بين المدرس والطلاب
 Route::resource('teachers.students', StudentController::class);
+
+
+
+
+
+
+
+// routes/web.php
+
+Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
+    Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+
+    Route::get('groups/{group}/attendance', [AttendanceController::class, 'groupAttendance'])->name('groups.attendance.index');
+    Route::post('groups/{group}/attendance', [AttendanceController::class, 'storeForGroup'])->name('groups.attendance.store');
+
+    Route::get('lectures/{lecture}/attendance/create', [AttendanceController::class, 'create'])->name('attendances.create');
+    Route::post('lectures/{lecture}/attendance', [AttendanceController::class, 'storeForLecture'])->name('attendances.store');
+
+    Route::get('lectures/{lecture}/attendance/report', [AttendanceController::class, 'report'])->name('attendances.report');
+    Route::get('lectures/{lecture}/attendance/{student}/edit', [AttendanceController::class, 'edit'])->name('attendances.edit');
+    Route::put('lectures/{lecture}/attendance/{student}', [AttendanceController::class, 'update'])->name('attendances.update');
+});
+
 
 // تضمين ملفات الراوتات الإضافية
 require __DIR__ . '/auth.php';

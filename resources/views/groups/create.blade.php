@@ -49,20 +49,6 @@
 
 
 
-        <div class="mb-3">
-            <label class="form-label">اختر الطلاب</label>
-            <div>
-                @foreach ($students as $student)
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="student_ids[]" value="{{ $student->id }}" id="student_{{ $student->id }}"
-                            {{ (is_array(old('student_ids')) && in_array($student->id, old('student_ids'))) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="student_{{ $student->id }}">
-                            {{ $student->name }}
-                        </label>
-                    </div>
-                @endforeach
-            </div>
-        </div>
 
         <button type="submit" class="btn btn-primary">إنشاء المجموعة</button>
     </form>
