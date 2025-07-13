@@ -6,6 +6,7 @@ use App\Models\Teacher;
 use App\Models\Subject;
 use App\Models\Lecture;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class TeachersController extends Controller
 {
@@ -18,9 +19,11 @@ class TeachersController extends Controller
 
     // ✅ عرض نموذج إضافة معلم جديد
     public function create()
+    
     {
-        $subjects = Subject::all();
-        return view('teachers.create', compact('subjects'));
+            $users = User::all(); // جلب جميع المستخدمين لعرضهم في القائمة
+
+        return view('teachers.create', compact('users'));
     }
 
     // ✅ تخزين معلم جديد مع التحقق من البيانات
@@ -28,18 +31,21 @@ class TeachersController extends Controller
     {
         $request->validate([
             'name'       => 'required|string|max:255',
-            'email'      => 'required|email|unique:teachers',
             'phone'      => 'nullable|string',
-            'subject_id' => 'required|exists:subjects,id',
+                    'user_id' => 'required|exists:users,id',
+
+        ]);
+        Teacher::create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+    'user_id' => $request->user_id,  // هذه قيمة المستخدم المختار من الفورم
         ]);
 
-        try {
-            Teacher::create($request->only(['name', 'email', 'phone', 'subject_id']));
-            return redirect()->route('teachers.index')->with('success', 'تم إضافة المعلم بنجاح');
-        } catch (\Exception $e) {
-            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
-        }
-    }
+
+      return redirect()->route('teachers.index')->with('success', 'تم إضافة المعلم بنجاح.');
+
+    }       
+    
 
     // ✅ عرض نموذج تعديل معلم محدد
     public function edit(Teacher $teacher)

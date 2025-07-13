@@ -39,9 +39,10 @@
                                 </button>
                             </form>
 
-<a href="{{ route('show_students', ['teacher' => $teacher->id]) }}" class="btn btn-info">
+<a href="{{ route('grades.showStudents', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-info">
     <i class="fas fa-check-circle"></i> عرض الطلاب 
 </a>
+
 
 
 

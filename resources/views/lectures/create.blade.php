@@ -19,6 +19,17 @@
                     </select>
                 </div>
 
+
+                <div class="mb-2">
+                    <label>المادة</label>
+                    <select name="lectures[0][subject_id]" class="form-select" required>
+                        <option value="">اختر المادة</option>
+                        @foreach ($teacher->subjects as $subject)
+                            <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <input type="text" name="lectures[0][title]" class="form-control mb-2" placeholder="عنوان المحاضرة" required>
                 <textarea name="lectures[0][description]" class="form-control mb-2" placeholder="وصف المحاضرة"></textarea>
                 <input type="datetime-local" name="lectures[0][start_time]" class="form-control mb-2" required>

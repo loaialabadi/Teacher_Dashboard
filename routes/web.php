@@ -125,18 +125,18 @@ Route::prefix('teachers/{teacher}')->group(function () {
 
 
 
-    Route::resource('grades', GradeController::class);
+ 
+
+Route::get('/teachers/{teacher}/grades/create', [GradeController::class, 'create'])->name('grades.create');
+Route::post('/teachers/{teacher}/grades', [GradeController::class, 'store'])->name('grades.store');
+Route::get('/teachers/{teacher}/grades/{grade}/edit', [GradeController::class, 'edit'])->name('grades.edit');
+Route::put('/teachers/{teacher}/grades/{grade}', [GradeController::class, 'update'])->name('grades.update');
+Route::delete('/teachers/{teacher}/grades/{grade}', [GradeController::class, 'destroy'])->name('grades.destroy');
+Route::get('/teachers/{teacher}/grades', [GradeController::class, 'index'])->name('grades.index');
+Route::get('/teachers/{teacher}/grades/{grade}/students', [GradeController::class, 'showStudentsGradeTeacher'])->name('grades.showStudents');
 
 
 
-
-Route::post('teachers/{teacher}/grades', [GradeController::class, 'store'])->name('teachers.grades.store');
-
-Route::resource('grades', GradeController::class);
-
-
-
-Route::resource('grades', GradeController::class)->except(['index', 'store', 'create']); // إذا تم التحكم فيهم داخل المعلم
 
 
 

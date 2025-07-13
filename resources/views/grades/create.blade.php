@@ -1,27 +1,28 @@
 @extends('layouts.index')
 
 @section('content')
-<div class="container">
-    <h2>إضافة فصل جديدة</h2>
+<div class="container my-4">
+    <h2 class="mb-4">➕ إضافة فصل دراسي جديد للمدرس: {{ $teacher->name }}</h2>
 
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" action="{{ route('grades.store', ['teacher' => $teacher->id]) }}">
+                @csrf
+                <div class="mb-3">
+                    <label for="grade_id" class="form-label">اختر الفصل الدراسي</label>
+                    <select name="grade_id" id="grade_id" class="form-select" required>
+                        <option value="" disabled selected>-- اختر الفصل --</option>
+                        @foreach($grades as $grade)
+                            <option value="{{ $grade->id }}">{{ $grade->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-plus-circle"></i> إضافة الفصل
+                </button>
+            </form>
         </div>
-    @endif
-
-<form method="POST" action="{{ route('grades.store', ['teacher' => $teacher->id]) }}">
-    @csrf
-    <select name="grade_id" required>
-        @foreach($grades as $grade)
-            <option value="{{ $grade->id }}">{{ $grade->name }}</option>
-        @endforeach
-    </select>
-    <button type="submit">إضافة</button>
-</form>
-
+    </div>
+</div>
 @endsection

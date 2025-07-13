@@ -7,6 +7,7 @@
         <tr>
             <th>عنوان المحاضرة</th>
             <th>التاريخ</th>
+            <th>المادة</th>
             <th>الإجراء</th>
         </tr>
     </thead>
@@ -15,6 +16,7 @@
             <tr>
                 <td>{{ $lecture->title }}</td>
                 <td>{{ $lecture->date }}</td>
+                <td>{{ $lecture->subject_id}}</td>
                 <td>
                     <a href="{{ route('attendances.create', $lecture->id) }}" class="btn btn-success btn-sm">
                         <i class="fas fa-user-check"></i> تسجيل الحضور

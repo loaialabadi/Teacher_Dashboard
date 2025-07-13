@@ -23,26 +23,33 @@ $lectures = Lecture::whereIn('group_id', $groupIds)->latest()->paginate(10);
         $teacher = Teacher::findOrFail($teacher_id);
         return view('lectures.create', compact('teacher'));
     }
-public function store(Request $request, $teacher_id)
-{
-    $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'start_time' => 'required|date',
-        'end_time' => 'required|date|after:start_time',
-        'group_id' => 'required|exists:groups,id',
-    ]);
 
-    Lecture::create([
-        'group_id' => $request->group_id,
-        'title' => $request->title,
-        'description' => $request->description,
-        'start_time' => $request->start_time,
-        'end_time' => $request->end_time,
-    ]);
 
-    return redirect()->route('lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرة بنجاح.');
-}
+    public function store(Request $request, $teacher_id)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date|after:start_time',
+            'group_id' => 'required|exists:groups,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'teacher_id' => 'required|exists:teachers,id',
+        ]);
+
+        Lecture::create([
+            'group_id' => $validated['group_id'],
+            'subject_id' => $validated['subject_id'], // هذا مهم جدًا
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+        ]);
+
+
+        return redirect()->route('lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرة بنجاح.');
+    }
+
 
 
     public function edit($teacher_id, Lecture $lecture)
@@ -72,25 +79,33 @@ public function store(Request $request, $teacher_id)
     }
 
 
-
-    public function storeMultiple(Request $request, $teacher_id)
+public function storeMultiple(Request $request, $teacher_id)
 {
-    $validated = $request->validate([
-        'lectures' => 'required|array|min:1',
-        'lectures.*.group_id' => 'required|exists:groups,id',
+    $request->validate([
+        'lectures' => 'required|array',
         'lectures.*.title' => 'required|string|max:255',
         'lectures.*.description' => 'nullable|string',
         'lectures.*.start_time' => 'required|date',
         'lectures.*.end_time' => 'required|date|after:lectures.*.start_time',
+        'lectures.*.group_id' => 'required|exists:groups,id',
+        'lectures.*.subject_id' => 'required|exists:subjects,id',
     ]);
 
-    foreach ($validated['lectures'] as $lectureData) {
-                $lectureData['teacher_id'] = $teacher_id;  // أضف هذا السطر
+    foreach ($request->lectures as $lectureData) {
+        Lecture::create([
+            'group_id' => $lectureData['group_id'],
+            'subject_id' => $lectureData['subject_id'],
+    'teacher_id' => $teacher_id, // من المعامل مباشرة
 
-        Lecture::create($lectureData);
+            'title' => $lectureData['title'],
+            'description' => $lectureData['description'] ?? null,
+            'start_time' => $lectureData['start_time'],
+            'end_time' => $lectureData['end_time'],
+        ]);
     }
 
     return redirect()->route('lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرات بنجاح.');
 }
+
 
 }

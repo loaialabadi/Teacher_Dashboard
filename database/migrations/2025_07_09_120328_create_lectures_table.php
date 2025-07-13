@@ -11,17 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-Schema::create('lectures', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('group_id')->constrained()->onDelete('cascade'); // المحاضرة مرتبطة بالمجموعة
-    $table->string('title');
-    $table->foreignId('teacher_id')->constrained()->onDelete('cascade');
+    Schema::create('lectures', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('group_id')->constrained()->onDelete('cascade'); // مجموعة المحاضرة
+        $table->foreignId('teacher_id')->constrained()->onDelete('cascade'); // المعلم
+        $table->foreignId('subject_id')->constrained()->onDelete('cascade'); // المادة
+        $table->string('title');
+        $table->text('description')->nullable();
+        $table->dateTime('start_time');
+        $table->dateTime('end_time');
+        $table->timestamps();
+    });
 
-    $table->text('description')->nullable();
-    $table->dateTime('start_time');
-    $table->dateTime('end_time');
-    $table->timestamps();
-});
     }
 
     /**

@@ -9,7 +9,7 @@ class Lecture extends Model
       use HasFactory;
 
     protected $fillable = [
-        'group_id', 'title', 'description', 'start_time', 'end_time','teacher_id'
+        'group_id', 'title', 'description', 'start_time', 'end_time','teacher_id', 'subject_id'
     ];
 
     public function teacher()
@@ -27,6 +27,11 @@ public function students()
     return $this->belongsToMany(Student::class, 'lecture_student');
 }
 
+// app/Models/Lecture.php
+public function subject()
+{
+    return $this->belongsTo(Subject::class);
+}
 
 
 }

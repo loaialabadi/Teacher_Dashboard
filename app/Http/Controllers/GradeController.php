@@ -38,13 +38,25 @@ class GradeController extends Controller
                 'grade_id' => 'required|exists:grades,id',
             ]);
 
-            GradeTeacher::create([
+            // تحقق من وجود العلاقة مسبقًا
+            $exists = \App\Models\GradeTeacher::where('teacher_id', $teacher->id)
+                        ->where('grade_id', $validated['grade_id'])
+                        ->exists();
+
+            if ($exists) {
+                return redirect()->back()->with('error', 'تم إضافة هذا الفصل الدراسي مسبقًا للمدرس.');
+            }
+
+            // إذا لم تكن موجودة، قم بإنشائها
+            \App\Models\GradeTeacher::create([
                 'teacher_id' => $teacher->id,
                 'grade_id' => $validated['grade_id'],
             ]);
 
-            return redirect()->route('grades.index', ['teacher' => $teacher->id]);
+            return redirect()->route('grades.index', ['teacher' => $teacher->id])
+                            ->with('success', 'تمت إضافة الفصل الدراسي بنجاح.');
         }
+
 
 
     public function destroy($teacherId, $gradeId)
@@ -71,13 +83,17 @@ class GradeController extends Controller
     /**
      * تحديث الفصل الدراسي المرتبط بالمعلم
      */
-public function showStudentsGradeTeacher(Teacher $teacher)
+public function showStudentsGradeTeacher(Teacher $teacher, Grade $grade)
 {
-    // جلب جميع الطلاب المرتبطين بهذا المعلم (مثلاً)
-    $students = $teacher->students()->get();
+    // جلب الطلاب المرتبطين بمجموعات نفس المعلم ونفس الفصل الدراسي
+    $students = \App\Models\Student::whereHas('groups', function ($query) use ($teacher, $grade) {
+        $query->where('teacher_id', $teacher->id)
+              ->where('grade_id', $grade->id);
+    })->with('groups')->get();
 
-    return view('teachers.show_students', compact('teacher', 'students'));
+    return view('grades.teacher_students', compact('students', 'teacher', 'grade'));
 }
+
 
 
 }

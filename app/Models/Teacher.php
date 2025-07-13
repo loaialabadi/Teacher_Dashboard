@@ -10,7 +10,7 @@ class Teacher extends Model
 {
     use HasFactory;
   // app/Models/Teacher.php
-protected $fillable = ['name', 'email', 'phone', 'subject_id'];
+protected $fillable = ['name', 'email', 'phone', 'subject_id', 'user_id'];
 
 public function subject()
 {

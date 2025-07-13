@@ -16,6 +16,7 @@
                 <tr>
                     <th>العنوان</th>
                     <th>الوصف</th>
+                    <th> اسم المادة</th>
                     <th>وقت البداية</th>
                     <th>وقت النهاية</th>
                     <th>المجموعة</th>
@@ -27,6 +28,7 @@
                     <tr>
                         <td>{{ $lecture->title }}</td>
                         <td>{{ $lecture->description ?? '-' }}</td>
+                    <td>{{ $lecture->subject->name ?? 'غير معروف' }}</td>
                         <td>{{ \Carbon\Carbon::parse($lecture->start_time)->format('Y-m-d H:i') }}</td>
                         <td>{{ \Carbon\Carbon::parse($lecture->end_time)->format('Y-m-d H:i') }}</td>
                         <td class="text-center">

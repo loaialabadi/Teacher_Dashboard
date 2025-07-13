@@ -94,7 +94,9 @@ $groupIds = $teacher->groups()->pluck('id');
 public function transferForm(Teacher $teacher, Group $sourceGroup)
 {
     // جلب جميع طلاب المعلم مع علاقات المجموعات
-    $students = $teacher->students()->with('groups')->get();
+$students = Student::whereHas('groups', function ($query) use ($teacher) {
+    $query->where('teacher_id', $teacher->id);
+})->with('groups')->get();
 
     // جلب جميع مجموعات المعلم عدا المجموعة الحالية
     $groups = Group::where('teacher_id', $teacher->id)
