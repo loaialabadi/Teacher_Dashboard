@@ -174,6 +174,10 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
 });
 
 
+
+Route::get('/teachers/{teacher}/today-lectures', [TeacherController::class, 'todayLectures'])->name('teachers.attendance.today');
+
+
 // تضمين ملفات الراوتات الإضافية
 require __DIR__ . '/auth.php';
 require __DIR__ . '/api.php';

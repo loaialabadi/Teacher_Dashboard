@@ -2,71 +2,69 @@
 
 @section('content')
 <div class="container my-4">
-    <h2>📚 إضافة محاضرات جديدة للمجموعة</h2>
+    <h2>➕ إضافة محاضرة</h2>
 
-    <form action="{{ route('lectures.storeMultiple', $teacher->id) }}" method="POST">
-        @csrf
-
-        <div id="lectures-container">
-            <div class="lecture-entry border p-3 mb-3">
-                <div class="mb-2">
-                    <label>المجموعة</label>
-                    <select name="lectures[0][group_id]" class="form-select" required>
-                        <option value="">اختر المجموعة</option>
-                        @foreach ($teacher->groups as $group)
-                            <option value="{{ $group->id }}">{{ $group->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-
-                <div class="mb-2">
-                    <label>المادة</label>
-                    <select name="lectures[0][subject_id]" class="form-select" required>
-                        <option value="">اختر المادة</option>
-                        @foreach ($teacher->subjects as $subject)
-                            <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <input type="text" name="lectures[0][title]" class="form-control mb-2" placeholder="عنوان المحاضرة" required>
-                <textarea name="lectures[0][description]" class="form-control mb-2" placeholder="وصف المحاضرة"></textarea>
-                <input type="datetime-local" name="lectures[0][start_time]" class="form-control mb-2" required>
-                <input type="datetime-local" name="lectures[0][end_time]" class="form-control mb-2" required>
-            </div>
+    {{-- نستخدم GET علشان نعيد تحميل الصفحة لما تتغير المجموعة --}}
+    <form method="GET" action="{{ route('lectures.create', $teacher->id) }}">
+        <div class="mb-3">
+            <label for="group_id">اختر المجموعة:</label>
+            <select name="group_id" id="group_id" class="form-select" onchange="this.form.submit()" required>
+                <option value="">اختر المجموعة</option>
+                @foreach($teacher->groups as $group)
+                    @if ($group->subject)
+                        <option value="{{ $group->id }}" {{ request('group_id') == $group->id ? 'selected' : '' }}>
+                            {{ $group->name }} - {{ $group->subject->name }}
+                        </option>
+                    @endif
+                @endforeach
+            </select>
         </div>
 
-        <button type="button" class="btn btn-secondary mb-3" onclick="addLecture()">➕ إضافة محاضرة أخرى</button>
-        <br>
-        <button type="submit" class="btn btn-success">💾 حفظ المحاضرات</button>
+
+
+
+
     </form>
+
+    {{-- فورم حفظ المحاضرة --}}
+    @if (request('group_id') && $selectedGroup)
+    <form method="POST" action="{{ route('lectures.store', $teacher->id) }}">
+        @csrf
+        <input type="hidden" name="group_id" value="{{ $selectedGroup->id }}">
+        <input type="hidden" name="subject_id" value="{{ $selectedGroup->subject->id }}">
+
+        <div class="mb-3">
+            <label>اسم المادة:</label>
+            <input type="text" class="form-control" value="{{ $selectedSubjectName }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label>عنوان المحاضرة:</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+            <div class="mb-3">
+        <label>الفصل الدراسي:</label>
+        <input type="text" class="form-control" value="{{ $selectedGroup->grade->name }}" readonly>
+    </div>
+
+        <div class="mb-3">
+            <label>وصف المحاضرة:</label>
+            <textarea name="description" class="form-control"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>تاريخ ووقت البدء:</label>
+            <input type="datetime-local" name="start_time" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>تاريخ ووقت الانتهاء:</label>
+            <input type="datetime-local" name="end_time" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">💾 حفظ المحاضرة</button>
+    </form>
+    @endif
 </div>
-
-<script>
-    let lectureIndex = 1;
-
-    function addLecture() {
-        const container = document.getElementById('lectures-container');
-        const html = `
-            <div class="lecture-entry border p-3 mb-3">
-                <div class="mb-2">
-                    <label>المجموعة</label>
-                    <select name="lectures[${lectureIndex}][group_id]" class="form-select" required>
-                        <option value="">اختر المجموعة</option>
-                        @foreach ($teacher->groups as $group)
-                            <option value="{{ $group->id }}">{{ $group->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <input type="text" name="lectures[${lectureIndex}][title]" class="form-control mb-2" placeholder="عنوان المحاضرة" required>
-                <textarea name="lectures[${lectureIndex}][description]" class="form-control mb-2" placeholder="وصف المحاضرة"></textarea>
-                <input type="datetime-local" name="lectures[${lectureIndex}][start_time]" class="form-control mb-2" required>
-                <input type="datetime-local" name="lectures[${lectureIndex}][end_time]" class="form-control mb-2" required>
-            </div>
-        `;
-        container.insertAdjacentHTML('beforeend', html);
-        lectureIndex++;
-    }
-</script>
 @endsection

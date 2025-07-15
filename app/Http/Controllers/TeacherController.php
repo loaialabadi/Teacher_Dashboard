@@ -7,6 +7,7 @@ use App\Models\SchoolGrade;
 use App\Models\Group;
 use Illuminate\Http\Request;
 
+
 class TeacherController extends Controller
 {
     // ✅ لوحة تحكم المعلم
@@ -54,4 +55,21 @@ class TeacherController extends Controller
 
         return view('teacher.show-grades', compact('teacher', 'grades', 'groups'));
     }
+
+   
+    //تسجيل حضور اليوم
+
+
+        public function todayLectures(Teacher $teacher)
+        {
+            $today = now()->format('Y-m-d');
+
+            $lectures = Lecture::where('teacher_id', $teacher->id)
+                        ->whereDate('start_time', $today)
+                        ->with(['group', 'subject'])
+                        ->get();
+
+            return view('teacher.attendance.today', compact('lectures', 'teacher'));
+        }
+
 }

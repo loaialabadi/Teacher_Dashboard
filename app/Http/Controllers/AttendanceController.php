@@ -61,22 +61,22 @@ class AttendanceController extends Controller
     }
 
     // 4. حفظ بيانات الحضور والغياب لمحاضرة معينة (تستخدم عند اختيار محاضرة)
-public function storeForLecture(Request $request, Teacher $teacher, Lecture $lecture)
-    {
-        $request->validate([
-            'statuses' => 'required|array',
-            'statuses.*' => 'in:present,absent,late',
-        ]);
+    public function storeForLecture(Request $request, Teacher $teacher, Lecture $lecture)
+        {
+            $request->validate([
+                'statuses' => 'required|array',
+                'statuses.*' => 'in:present,absent,late',
+            ]);
 
-        foreach ($request->statuses as $studentId => $status) {
-            Attendance::updateOrCreate(
-                ['lecture_id' => $lecture->id, 'student_id' => $studentId],
-                ['status' => $status]
-            );
+            foreach ($request->statuses as $studentId => $status) {
+                Attendance::updateOrCreate(
+                    ['lecture_id' => $lecture->id, 'student_id' => $studentId],
+                    ['status' => $status]
+                );
+            }
+
+            return redirect()->route('attendances.create', $lecture->id)->with('success', 'تم تسجيل الحضور بنجاح.');
         }
-
-        return redirect()->route('attendances.create', $lecture->id)->with('success', 'تم تسجيل الحضور بنجاح.');
-    }
 
     // 5. عرض تقرير الحضور لمحاضرة معينة
         public function report(Teacher $teacher, Lecture $lecture)

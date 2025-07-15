@@ -8,47 +8,66 @@ use Illuminate\Http\Request;
 
 class LectureController extends Controller
 {
-    public function index($teacher_id)
-    {
-        $teacher = Teacher::findOrFail($teacher_id);
-        $groupIds = $teacher->groups()->pluck('id');
+        public function index($teacher_id)
+        {
+            // جلب المعلم مع المجموعات وعلاقات المواد
+            $teacher = Teacher::with('groups.subject')->findOrFail($teacher_id);
 
-$lectures = Lecture::whereIn('group_id', $groupIds)->latest()->paginate(10);
+            // استخراج ids المجموعات
+            $groupIds = $teacher->groups->pluck('id');
 
-        return view('lectures.index', compact('teacher', 'lectures', 'groupIds'));
+            // جلب المحاضرات للمجموعات
+            $lectures = Lecture::whereIn('group_id', $groupIds)->latest()->paginate(10);
+
+            return view('lectures.index', compact('teacher', 'lectures', 'groupIds'));
+        }
+
+
+public function create(Request $request, $teacher_id)
+{
+$teacher = Teacher::with('groups.subject', 'groups.grade')->findOrFail($teacher_id);
+
+    $selectedGroup = null;
+    $selectedSubjectName = null;
+
+    if ($request->has('group_id')) {
+        $selectedGroup = $teacher->groups->where('id', $request->group_id)->first();
+        if ($selectedGroup && $selectedGroup->subject) {
+            $selectedSubjectName = $selectedGroup->subject->name;
+        }
     }
 
-    public function create($teacher_id)
-    {
-        $teacher = Teacher::findOrFail($teacher_id);
-        return view('lectures.create', compact('teacher'));
-    }
+    return view('lectures.create', compact('teacher', 'selectedGroup', 'selectedSubjectName'));
+}
 
 
-    public function store(Request $request, $teacher_id)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
-            'group_id' => 'required|exists:groups,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'teacher_id' => 'required|exists:teachers,id',
-        ]);
+        public function store(Request $request, $teacher_id)
+        {
+            $request->merge(['teacher_id' => $teacher_id]);
 
-        Lecture::create([
-            'group_id' => $validated['group_id'],
-            'subject_id' => $validated['subject_id'], // هذا مهم جدًا
-            'title' => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-        ]);
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'start_time' => 'required|date',
+                'end_time' => 'required|date|after:start_time',
+                'group_id' => 'required|exists:groups,id',
+                'subject_id' => 'required|exists:subjects,id',
+                'teacher_id' => 'required|exists:teachers,id',
+            ]);
 
+            Lecture::create([
+                'group_id' => $validated['group_id'],
+                'subject_id' => $validated['subject_id'],
+                'teacher_id' => $teacher_id,
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+            ]);
 
-        return redirect()->route('lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرة بنجاح.');
-    }
+            return redirect()->route('lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرة بنجاح.');
+        }
+
 
 
 

@@ -76,4 +76,10 @@
     </div>
 
 </div>
+
+
+<a href="{{ route('teachers.attendance.today', $teacher->id) }}" class="btn btn-primary">
+    📅 تسجيل حضور اليوم
+</a>
+
 @endsection
