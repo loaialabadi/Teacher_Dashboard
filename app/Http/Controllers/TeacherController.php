@@ -72,4 +72,9 @@ class TeacherController extends Controller
             return view('teacher.attendance.today', compact('lectures', 'teacher'));
         }
 
+
+        public function settings(Teacher $teacher)
+        {
+            return view('teacher.settings.index', compact('teacher'));
+        }
 }

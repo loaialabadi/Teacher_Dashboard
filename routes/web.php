@@ -24,6 +24,9 @@ Route::get('/', function () {
 // لوحة تحكم الأدمن
 Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
+
+Route::get('/teacher/{teacher}/settings', [TeacherController::class, 'settings'])->name('teacher.settings');
+
 // موارد أساسية: المعلمين، الطلاب، أولياء الأمور، الفصول
 Route::resource('teachers', TeachersController::class);
 Route::resource('students', StudentController::class);
