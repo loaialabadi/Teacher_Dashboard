@@ -30,9 +30,9 @@
       <i class="fas fa-chalkboard-teacher"></i> <span>المعلمون</span>
     </a>
 
-<a href="{{ isset($teacher) ? route('students.index', ['teacher' => $teacher->id]) : '#' }}" class="{{ request()->routeIs('students.*') ? 'active' : '' }}">
-  <i class="fas fa-user-graduate"></i> <span>الطلاب</span>
-</a>
+    <a href="{{ route('students.all')}}" class="{{ request()->routeIs('students.*') ? 'active' : '' }}">
+      <i class="fas fa-user-graduate"></i> <span>الطلاب</span>
+    </a>
 
 
     <a href="{{ route('parents.index') }}" class="{{ request()->routeIs('parents.*') ? 'active' : '' }}">

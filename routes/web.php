@@ -14,7 +14,7 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\SchoolGradeController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\LectureController;
-
+use App\Http\Controllers\StudentAllsController;
 
 // الصفحة الرئيسية
 Route::get('/', function () {
@@ -24,6 +24,7 @@ Route::get('/', function () {
 // لوحة تحكم الأدمن
 Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
+Route::get('/students/all', [StudentAllsController::class, 'index'])->name('students.all');
 
 Route::get('/teacher/{teacher}/settings', [TeacherController::class, 'settings'])->name('teacher.settings');
 
@@ -83,7 +84,6 @@ Route::prefix('teachers/{teacher}')->group(function () {
 
     // الطلاب
     Route::resource('students', StudentController::class);
-
 
 
 

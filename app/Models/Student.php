@@ -3,107 +3,103 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable; // استخدم Authenticatable للمصادقة
+use Illuminate\Foundation\Auth\User as Authenticatable; // للمصادقة
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\Subject;
-use App\Models\Teacher;
-use App\Models\ParentModel;
-use App\Models\Grade;
+
 class Student extends Authenticatable
 {
     use HasApiTokens, HasFactory;
 
-    protected $fillable = ['name', 'phone', 'password', 'teacher_id', 'parent_id'];
+    protected $fillable = [
+        'name',
+        'phone',
+        'password',
+        'teacher_id',
+        'parent_id',
+        'subject_id',
+        'school_grade_id',
+        'group_id',
+    ];
 
     protected $hidden = ['password'];
 
-    public function teacher()
+    /*
+    |--------------------------------------------------------------------------
+    | العلاقات الأساسية
+    |--------------------------------------------------------------------------
+    */
+
+    // ولي الأمر
+    public function parent()
     {
-        return $this->belongsTo(Teacher::class);
+        return $this->belongsTo(ParentModel::class, 'parent_id');
     }
 
+    // المادة الرئيسية
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
 
-public function parent()
-{
-    return $this->belongsTo(ParentModel::class, 'parent_id'); // أو 'parent_id' حسب العمود
-}
+    // المرحلة/الفصل الدراسي
+    public function grade()
+    {
+        return $this->belongsTo(SchoolGrade::class, 'school_grade_id');
+    }
 
+    // المجموعة الحالية
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
+    }
 
+    /*
+    |--------------------------------------------------------------------------
+    | علاقات إضافية (حسب الحاجة)
+    |--------------------------------------------------------------------------
+    */
+
+    // لو الطالب ممكن ياخد أكثر من مادة
     public function subjects()
     {
-        return $this->belongsToMany(Subject::class);
+        return $this->belongsToMany(Subject::class, 'student_subject');
     }
 
-        public function groups()
+    // لو الطالب ممكن ينتمي لأكثر من مجموعة
+    public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_student');
     }
 
-public function group()
-{
-    return $this->belongsTo(Group::class);
+    // علاقة مع المعلم الأساسي (إن وجد)
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class, 'teacher_id');
+    }
+
+    // لو الطالب ممكن يدرس مع أكثر من معلم
+    public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class, 'student_teacher')
+                    ->withPivot('subject_id')
+                    ->withTimestamps();
+    }
+
+    // الحصص/المحاضرات
+    public function lectures()
+    {
+        return $this->belongsToMany(Lecture::class, 'lecture_student');
+    }
+
+    // مواعيد خاصة بالطالب
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    // لو عندك جدول student_grade للربط بين الطلاب والفصول
+    public function grades()
+    {
+        return $this->belongsToMany(Grade::class, 'student_grade');
+    }
 }
-public function lectures()
-{
-    return $this->belongsToMany(Lecture::class, 'lecture_student');
-}
-
-
-public function appointments()
-{
-    return $this->hasMany(Appointment::class);
-}
-
-
-// Student.php
-public function grade()
-{
-    return $this->belongsTo(SchoolGrade::class, 'school_grade_id');
-}
-
-
-public function subject()
-{
-    return $this->belongsTo(Subject::class);
-}
-
-
-
-
-
-
-
-
-// في موديل Student
-public function studentTeacher()
-{
-    return $this->hasMany(StudentTeacher::class, 'student_id');
-}
-
-
-
-
-
-
-public function groupStudents()
-{
-    return $this->hasMany(GroupStudent::class);
-}
-
-public function teachers()
-{
-    return $this->belongsToMany(Teacher::class, 'student_teacher')
-                ->withPivot('subject_id')
-                ->withTimestamps();
-}
-
-
-
-public function grades()
-{
-    return $this->belongsToMany(Grade::class, 'student_grade'); // مثال
-}
-
-
-}
-
