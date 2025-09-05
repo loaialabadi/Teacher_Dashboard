@@ -14,7 +14,7 @@ class TeachersController extends Controller
     public function index()
     {
         $teachers = Teacher::with('subject', 'groups')->get();
-        return view('teachers.index', compact('teachers'));
+        return view('teacher.teachers.index', compact('teachers'));
     }
 
     // ✅ عرض نموذج إضافة معلم جديد
@@ -23,7 +23,7 @@ class TeachersController extends Controller
     {
             $users = User::all(); // جلب جميع المستخدمين لعرضهم في القائمة
 
-        return view('teachers.create', compact('users'));
+        return view('teacher.teachers.create', compact('users'));
     }
 
     // ✅ تخزين معلم جديد مع التحقق من البيانات
@@ -42,7 +42,7 @@ class TeachersController extends Controller
         ]);
 
 
-      return redirect()->route('teachers.index')->with('success', 'تم إضافة المعلم بنجاح.');
+      return redirect()->route('teacher.teachers.index')->with('success', 'تم إضافة المعلم بنجاح.');
 
     }       
     
@@ -51,7 +51,7 @@ class TeachersController extends Controller
     public function edit(Teacher $teacher)
     {
         $subjects = Subject::all();
-        return view('teachers.edit', compact('teacher', 'subjects'));
+        return view('teacher.teachers.edit', compact('teacher', 'subjects'));
     }
 
     // ✅ تحديث بيانات معلم محدد
@@ -75,7 +75,7 @@ class TeachersController extends Controller
     public function destroy(Teacher $teacher)
     {
         $teacher->delete();
-        return redirect()->route('teachers.index')->with('success', 'تم حذف المعلم بنجاح');
+        return redirect()->route('teacher.teachers.index')->with('success', 'تم حذف المعلم بنجاح');
     }
 
     // ✅ لوحة تحكم المعلم
@@ -88,7 +88,7 @@ class TeachersController extends Controller
 
         $lectures = $teacher->lectures->sortBy('start_time'); // ترتيب الحصص
 
-        return view('teacher.dashboard', compact('teacher', 'lectures', 'groupId'));
+        return view('teacher.teacher.dashboard', compact('teacher', 'lectures', 'groupId'));
     }
 
     // ✅ عرض الحصص الخاصة بالمعلم
@@ -100,7 +100,7 @@ class TeachersController extends Controller
 
         $groupId = $teacher->groups->first()?->id;
 
-        return view('teachers.dashboard', [
+        return view('teacher.teachers.dashboard', [
             'teacher' => $teacher,
             'lectures' => $lectures,
             'groups' => $teacher->groups,

@@ -12,7 +12,7 @@ class Lecture extends Model
       use HasFactory;
 
     protected $fillable = [
-        'group_id', 'title', 'description', 'start_time', 'end_time','teacher_id', 'subject_id'
+        'group_id', 'title', 'description', 'start_time', 'end_time','teacher_id', 'subject_id', 'day_of_week'
     ];
 
 

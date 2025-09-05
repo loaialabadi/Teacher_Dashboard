@@ -17,6 +17,7 @@ return new class extends Migration
         $table->foreignId('teacher_id')->constrained()->onDelete('cascade'); // المعلم
         $table->foreignId('subject_id')->constrained()->onDelete('cascade'); // المادة
         $table->string('title');
+        $table->enum('day_of_week', ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
         $table->text('description')->nullable();
         $table->dateTime('start_time');
         $table->dateTime('end_time');
