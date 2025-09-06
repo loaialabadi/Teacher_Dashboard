@@ -18,16 +18,16 @@
                 <td>{{ $lecture->date }}</td>
                 <td>{{ $lecture->subject_id}}</td>
                 <td>
-                    <a href="{{ route('attendances.create', $lecture->id) }}" class="btn btn-success btn-sm">
-                        <i class="fas fa-user-check"></i> تسجيل الحضور
-                    </a>
-                    <a href="{{ route('teachers.attendances.report', ['teacher' => $teacher->id, 'lecture' => $lecture->id]) }}">
-                        عرض تقرير الحضور
-                    </a>
+             <a href="{{ route('teachers.lectures.attendance.create', ['teacher' => $teacher->id, 'lecture' => $lecture->id]) }}" class="btn btn-success btn-sm">
+    <i class="fas fa-user-check"></i> تسجيل الحضور
+</a>
+
+<a href="{{ route('teachers.lectures.attendance.report', ['teacher' => $teacher->id, 'lecture' => $lecture->id]) }}">
+    عرض تقرير الحضور
+</a>
 
 
-
-                    <a href="{{ route('teachers.attendances.edit', ['teacher' => $lecture->teacher_id, 'lecture' => $lecture->id, 'student' => 0]) }}" class="btn btn-primary btn-sm">
+                    <a href="{{ route('teachers.lectures.attendance.edit', ['teacher' => $lecture->teacher_id, 'lecture' => $lecture->id, 'student' => 0]) }}" class="btn btn-primary btn-sm">
                         <i class="fas fa-edit"></i> تحديث الحضور
                     </a>
                 </td>

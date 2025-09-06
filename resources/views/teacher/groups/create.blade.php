@@ -14,7 +14,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('groups.store', ['teacher' => $teacher->id]) }}">
+    <form method="POST" action="{{ route('teachers.groups.store', ['teacher' => $teacher->id]) }}">
         @csrf
         <input type="hidden" name="teacher_id" value="{{ $teacher->id }}">
 

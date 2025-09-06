@@ -5,7 +5,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">📘 مجموعات المعلم: <span class="text-primary">{{ $teacher->name }}</span></h2>
-        <a href="{{ route('groups.create', $teacher->id) }}" class="btn btn-dark">
+        <a href="{{ route('teachers.groups.create', $teacher->id) }}" class="btn btn-dark">
             <i class="fas fa-plus-circle"></i> إنشاء مجموعة جديدة
         </a>
     </div>
@@ -18,13 +18,13 @@
                     <small class="text-muted">👥 عدد الطلاب: {{ $group->students->count() }}</small>
                 </div>
                 <div class="btn-group" role="group">
-                    <a href="{{ route('groups.show', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="btn btn-outline-primary btn-sm">
+                    <a href="{{ route('teachers.groups.show', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-eye"></i> عرض التفاصيل
                     </a>
-                    <a href="{{ route('groups.transferForm', ['teacher' => $teacher->id, 'sourceGroup' => $group->id]) }}" class="btn btn-outline-warning btn-sm">
+                    <a href="{{ route('teachers.groups.transfer.form', ['teacher' => $teacher->id, 'sourceGroup' => $group->id]) }}" class="btn btn-outline-warning btn-sm">
                         <i class="fas fa-random"></i> نقل طلاب
                     </a>
-                    <a href="{{ route('groups.add-student', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="btn btn-outline-success btn-sm">
+                    <a href="{{ route('teachers.groups.add-student', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="btn btn-outline-success btn-sm">
                         <i class="fas fa-user-plus"></i> إضافة طالب
                     </a>
 <a href="{{ route('teachers.groups.attendance.index', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="btn btn-primary">

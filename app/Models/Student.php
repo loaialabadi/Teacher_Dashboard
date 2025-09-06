@@ -102,4 +102,9 @@ class Student extends Authenticatable
     {
         return $this->belongsToMany(Grade::class, 'student_grade');
     }
+
+    public function studentTeacher()
+    {
+        return $this->hasMany(StudentTeacher::class, 'student_id');
+    }
 }

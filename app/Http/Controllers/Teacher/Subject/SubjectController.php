@@ -38,7 +38,7 @@ public function store(Request $request, Teacher $teacher)
 
     $teacher->subjects()->attach($validated['subjects']);
 
-    return redirect()->route('subjects.index', $teacher)->with('success', 'تمت إضافة المواد بنجاح.');
+    return redirect()->route('teachers.subjects.index', $teacher)->with('success', 'تمت إضافة المواد بنجاح.');
 }
 
 

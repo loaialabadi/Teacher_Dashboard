@@ -6,7 +6,7 @@
 <div class="container">
     <h2>➕ إضافة مواد للمدرس: {{ $teacher->name }}</h2>
 
-    <form method="POST" action="{{ route('subjects.store', $teacher->id) }}">
+    <form method="POST" action="{{ route('teachers.subjects.store', $teacher->id) }}">
         @csrf
 
         <div class="form-group">

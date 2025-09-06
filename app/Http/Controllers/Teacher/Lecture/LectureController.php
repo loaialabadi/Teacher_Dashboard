@@ -77,7 +77,7 @@ $teacher = Teacher::with('groups.subject', 'groups.grade')->findOrFail($teacher_
                 'end_time' => $validated['end_time'],
             ]);
 
-            return redirect()->route('lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرة بنجاح.');
+            return redirect()->route('teachers.lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرة بنجاح.');
         }
 
 

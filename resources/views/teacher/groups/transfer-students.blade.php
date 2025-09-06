@@ -5,7 +5,7 @@
 
     <h2>نقل طلاب من مجموعة: {{ $sourceGroup->name }}</h2>
 
-    <form action="{{ route('groups.transfer', ['teacher' => $teacher->id, 'sourceGroup' => $sourceGroup->id]) }}" method="POST">
+    <form action="{{ route('teachers.groups.transfer', ['teacher' => $teacher->id, 'sourceGroup' => $sourceGroup->id]) }}" method="POST">
         @csrf
 
         <div class="mb-3">

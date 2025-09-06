@@ -4,7 +4,7 @@
 <div class="container my-4">
     <h2 class="mb-4">📚 قائمة الفصول الدراسية للمعلم: {{ $teacher->name }}</h2>
 
-    <a href="{{ route('grades.create', ['teacher' => $teacher->id]) }}" class="btn btn-success mb-3">
+    <a href="{{ route('teachers.grades.create', ['teacher' => $teacher->id]) }}" class="btn btn-success mb-3">
         <i class="fas fa-plus"></i> إضافة فصل دراسي جديد
     </a>
 
@@ -27,11 +27,11 @@
                         <td>{{ $grade->name ?? '-' }}</td>
                         <td>{{ \Carbon\Carbon::parse($grade->date)->format('Y-m-d') }}</td>
                         <td>
-                            <a href="{{ route('grades.edit', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-sm btn-primary">
+                            <a href="{{ route('teachers.grades.edit', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-edit"></i> تعديل
                             </a>
 
-                            <form action="{{ route('grades.destroy', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" method="POST" style="display:inline;">
+                            <form action="{{ route('teachers.grades.destroy', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد من حذف هذا الفصل الدراسي؟')">
@@ -39,7 +39,7 @@
                                 </button>
                             </form>
 
-<a href="{{ route('grades.showStudents', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-info">
+<a href="{{ route('teachers.show', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-info">
     <i class="fas fa-check-circle"></i> عرض الطلاب 
 </a>
 

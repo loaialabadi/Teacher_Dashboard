@@ -5,7 +5,7 @@
     <h2>➕ إضافة محاضرة</h2>
 
     {{-- نستخدم GET علشان نعيد تحميل الصفحة لما تتغير المجموعة --}}
-    <form method="GET" action="{{ route('lectures.create', $teacher->id) }}">
+    <form method="GET" action="{{ route('teachers.lectures.create', $teacher->id) }}">
         <div class="mb-3">
             <label for="group_id">اختر المجموعة:</label>
             <select name="group_id" id="group_id" class="form-select" onchange="this.form.submit()" required>
@@ -20,15 +20,11 @@
             </select>
         </div>
 
-
-
-
-
     </form>
 
     {{-- فورم حفظ المحاضرة --}}
     @if (request('group_id') && $selectedGroup)
-    <form method="POST" action="{{ route('lectures.store', $teacher->id) }}">
+    <form method="POST" action="{{ route('teachers.lectures.store', $teacher->id) }}">
         @csrf
         <input type="hidden" name="group_id" value="{{ $selectedGroup->id }}">
         <input type="hidden" name="subject_id" value="{{ $selectedGroup->subject->id }}">

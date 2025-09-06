@@ -53,7 +53,7 @@ class GradeController extends Controller
                 'grade_id' => $validated['grade_id'],
             ]);
 
-            return redirect()->route('grades.index', ['teacher' => $teacher->id])
+            return redirect()->route('teachers.grades.index', ['teacher' => $teacher->id])
                             ->with('success', 'تمت إضافة الفصل الدراسي بنجاح.');
         }
 
@@ -67,7 +67,7 @@ class GradeController extends Controller
 
         $gradeTeacher->delete();
 
-        return redirect()->route('grades.index', $teacherId)
+        return redirect()->route('teachers.grades.index', $teacherId)
                         ->with('success', 'تم حذف الفصل الدراسي بنجاح.');
     }
 
@@ -83,7 +83,7 @@ class GradeController extends Controller
     /**
      * تحديث الفصل الدراسي المرتبط بالمعلم
      */
-public function showStudentsGradeTeacher(Teacher $teacher, Grade $grade)
+public function show(Teacher $teacher, Grade $grade)
 {
     // جلب الطلاب المرتبطين بمجموعات نفس المعلم ونفس الفصل الدراسي
     $students = \App\Models\Student::whereHas('groups', function ($query) use ($teacher, $grade) {

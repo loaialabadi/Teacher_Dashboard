@@ -7,7 +7,7 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="POST" action="{{ route('grades.store', ['teacher' => $teacher->id]) }}">
+            <form method="POST" action="{{ route('teachers.grades.store', ['teacher' => $teacher->id]) }}">
                 @csrf
                 <div class="mb-3">
                     <label for="grade_id" class="form-label">اختر الفصل الدراسي</label>

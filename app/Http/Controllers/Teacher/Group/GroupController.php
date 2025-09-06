@@ -50,7 +50,7 @@ class GroupController extends Controller
 
         $group->students()->sync($request->student_ids);
 
-        return redirect()->route('teachers.teachers.groups.index', $teacherId)
+        return redirect()->route('teachers.groups.index', $teacherId)
                          ->with('success', 'تم إنشاء المجموعة بنجاح');
     }
 
@@ -123,7 +123,7 @@ class GroupController extends Controller
         // ربط الطلاب بالمجموعة الجديدة بدون تكرار
         $targetGroup->students()->syncWithoutDetaching($request->student_ids);
 
-        return redirect()->route('teachers.teachers.groups.index', $teacher->id)
+        return redirect()->route('teachers.groups.index', $teacher->id)
                          ->with('success', 'تم نقل الطلاب بنجاح.');
     }
 

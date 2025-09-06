@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
-
+namespace App\Http\Controllers\Teacher;
+use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use App\Models\Subject;
 use App\Models\Lecture;
@@ -107,4 +107,6 @@ class TeachersController extends Controller
             'groupId' => $groupId,
         ]);
     }
+
+
 }

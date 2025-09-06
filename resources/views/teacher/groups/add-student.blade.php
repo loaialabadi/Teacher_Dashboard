@@ -4,7 +4,7 @@
 <div class="container">
     <h2>إضافة طالب للمجموعة: {{ $group->name }}</h2>
 
-    <form action="{{ route('groups.add-student.form', ['teacher' => $teacher->id, 'group' => $group->id]) }}" method="POST">
+    <form action="{{ route('teachers.groups.add-student.form', ['teacher' => $teacher->id, 'group' => $group->id]) }}" method="POST">
         @csrf
 
         <div class="mb-3">

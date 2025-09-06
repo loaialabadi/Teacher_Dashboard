@@ -5,15 +5,28 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\Teacher;
-
+use Illuminate\Http\Request;
 class StudentController extends Controller
 {
     // عرض كل الطلاب
-    public function index()
-    {
-        $students = Student::with(['parent', 'grade'])->get();
-        return view('student.index', compact('students'));
+public function index(Request $request)
+{
+    $query = Student::with(['parent', 'grade']);
+
+    if ($request->filled('q')) {
+        $search = $request->q;
+        $query->where('name', 'like', "%{$search}%")
+              ->orWhere('phone', 'like', "%{$search}%")
+              ->orWhereHas('parent', function($q) use ($search) {
+                  $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+              });
     }
+
+    $students = $query->get();
+
+    return view('student.index', compact('students'));
+}
 
     // عرض تفاصيل طالب معين (مع المدرسين المرتبطين بيه)
     public function show($id)

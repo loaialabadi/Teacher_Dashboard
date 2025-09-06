@@ -40,6 +40,6 @@
         </table>
     @endif
 
-    <a href="{{ route('groups.index', $teacher->id) }}" class="btn btn-secondary mt-3">رجوع إلى المجموعات</a>
+    <a href="{{ route('teachers.groups.index', $teacher->id) }}" class="btn btn-secondary mt-3">رجوع إلى المجموعات</a>
 </div>
 @endsection

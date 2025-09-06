@@ -4,12 +4,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Teacher\Group\GroupController;
 use App\Http\Controllers\Teacher\Subject\SubjectController;
-use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\Teacher\Grade\GradeController;
 use App\Http\Controllers\Teacher\Lecture\LectureController;
 use App\Http\Controllers\Teacher\Attendance\AttendanceController;
 use App\Http\Controllers\Student\StudentController;
-use App\Http\Controllers\TeachersController;
+use App\Http\Controllers\Teacher\TeachersController;
+use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ParentController;
@@ -62,6 +62,7 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
     // لوحة التحكم
     Route::get('/dashboard', [TeachersController::class, 'dashboard'])->name('dashboard');
 
+    
     // المجموعات
     Route::prefix('groups')->name('groups.')->group(function () {
         Route::get('/', [GroupController::class, 'index'])->name('index');
@@ -85,7 +86,7 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
     });
 
     // الطلاب
-    Route::resource('students', StudentController::class);
+    Route::resource('students', TeacherStudentController::class);
 
     // المواد
     Route::resource('subjects', SubjectController::class);
@@ -109,11 +110,11 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
     });
 
     // عرض الطلاب وتقييماتهم
-    Route::get('showstudents', [TeacherController::class, 'showStudents'])->name('showstudents');
     Route::get('show-grades', [TeacherController::class, 'showGrades'])->name('showgrades');
+        Route::get('/teacher/settings', [TeacherController::class, 'settings'])->name('teacher.settings');
+
     Route::get('attendance-overview', [TeachersController::class, 'showAttendance'])->name('attendance.overview');
     // إعدادات المدرس
-    // Route::get('/teacher/settings', [TeachersController::class, 'settings'])->name('teacher.settings');
 });
 
 // الدرجات
@@ -123,5 +124,27 @@ Route::resource('teachers.grades', GradeController::class);
 Route::get('/teachers/{teacher}/today-lectures', [TeacherController::class, 'todayLectures'])
     ->name('teacher.today_lectures');
 
-// تضمين api.php
+
+
+    
+
+    Route::prefix('teachers/{teacher}/students')->name('teachers.students.')->group(function () {
+
+    // عرض كل الطلاب
+    Route::get('/', [TeacherController::class, 'showStudents'])->name('index');
+
+    // إنشاء طالب جديد
+    Route::get('/create', [TeacherController::class, 'createStudent'])->name('create');
+    Route::post('/', [TeacherController::class, 'storeStudent'])->name('store');
+
+    // عرض طالب معين
+    Route::get('/{student}', [TeacherController::class, 'showStudent'])->name('show');
+
+    // تعديل طالب
+    Route::get('/{student}/edit', [TeacherController::class, 'editStudent'])->name('edit');
+    Route::put('/{student}', [TeacherController::class, 'updateStudent'])->name('update');
+
+    // حذف طالب
+    Route::delete('/{student}', [TeacherController::class, 'destroyStudent'])->name('destroy');
+});
 require __DIR__ . '/api.php';
