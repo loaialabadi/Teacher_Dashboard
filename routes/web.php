@@ -131,7 +131,10 @@ Route::get('/teachers/{teacher}/today-lectures', [TeacherController::class, 'tod
     Route::prefix('teachers/{teacher}/students')->name('teachers.students.')->group(function () {
 
     // عرض كل الطلاب
-    Route::get('/', [TeacherController::class, 'showStudents'])->name('index');
+    Route::get('/', [TeacherController::class, 'showGrades'])->name('index');
+    // routes/web.php ضمن نفس البريفكس والـ name
+Route::get('/grade/{grade}', [TeacherController::class, 'showStudentsByGrade'])->name('grade');
+
 
     // إنشاء طالب جديد
     Route::get('/create', [TeacherController::class, 'createStudent'])->name('create');

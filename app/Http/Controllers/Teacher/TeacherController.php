@@ -9,6 +9,7 @@ use App\Models\ParentModel;
 use App\Models\Group;
 use App\Models\Lecture;
 use Illuminate\Http\Request;
+use App\Models\Grade;
 
 class TeacherController extends Controller
 {
@@ -34,17 +35,56 @@ class TeacherController extends Controller
     }
 
     // عرض الطلاب المرتبطين بالمعلم
-public function showStudents($teacherId)
+// صفحة الفصول
+public function showGrades($teacherId)
 {
-    // جلب المعلم مع علاقاته
-    $teacher = Teacher::with(['students.parent', 'students.groups', 'students.studentTeacher.subject'])
-                      ->findOrFail($teacherId);
+    $teacher = Teacher::findOrFail($teacherId);
+    $grades = Grade::all();
 
-    // جلب الطلاب المرتبطين بالمعلم
-    $students = $teacher->students()->with(['parent', 'groups', 'studentTeacher.subject'])->get();
+    // جهز كل فصل مع عدد الطلاب
+    $gradesWithCount = $grades->map(function($grade) use ($teacher) {
+        $grade->students_count = Student::where('grade_id', $grade->id)
+            ->whereHas('studentTeacher', function($q) use ($teacher) {
+                $q->where('teacher_id', $teacher->id);
+            })
+            ->count();
+        return $grade; // ارجع الكائن نفسه بعد اضافة students_count
+    });
 
-    return view('teacher.students.index', compact('teacher', 'students'));
+    return view('teacher.students.grades', [
+        'teacher' => $teacher,
+        'grades' => $gradesWithCount
+    ]);
 }
+
+
+
+
+public function showStudentsByGrade($teacherId, $gradeId, $subjectId = null)
+{
+    $teacher = Teacher::findOrFail($teacherId);
+    $grade = Grade::findOrFail($gradeId);
+
+    $students = Student::where('grade_id', $grade->id)
+        ->whereHas('studentTeacher', function($q) use ($teacher, $subjectId) {
+            $q->where('teacher_id', $teacher->id);
+            if ($subjectId) {
+                $q->where('subject_id', $subjectId);
+            }
+        })
+        ->with(['parent', 'groups', 'studentTeacher' => function($q) use ($teacher, $subjectId) {
+            $q->where('teacher_id', $teacher->id);
+            if ($subjectId) {
+                $q->where('subject_id', $subjectId);
+            }
+            $q->with('subject');
+        }])
+        ->get();
+
+    return view('teacher.students.index', compact('teacher', 'grade', 'students'));
+}
+
+
 
     // عرض نموذج إضافة طالب جديد
     public function createStudent(Teacher $teacher)
@@ -103,6 +143,7 @@ public function showStudents($teacherId)
         return view('teacher.students.show', compact('teacher', 'student'));
     }
 
+
     // تعديل طالب
 public function editStudent(Teacher $teacher, Student $student)
 {
@@ -138,12 +179,7 @@ public function editStudent(Teacher $teacher, Student $student)
             ->with('success', 'تم حذف الطالب بنجاح');
     }
 
-    // عرض الصفوف الخاصة بالمعلم
-    public function showGrades(Teacher $teacher)
-    {
-        $grades = $teacher->schoolGrades()->with('groups.students')->get();
-        return view('teacher.show-grades', compact('teacher', 'grades'));
-    }
+
 
     // حضور اليوم
     public function todayLectures(Teacher $teacher)

@@ -8,7 +8,7 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-<form action="{{ route('teachers.attendances.store', ['teacher' => $teacher->id, 'lecture' => $lecture->id]) }}" method="POST">
+<form action="{{ route('teachers.lectures.attendance.store', ['teacher' => $teacher->id, 'lecture' => $lecture->id]) }}" method="POST">
         @csrf
 
         <table class="table table-bordered">

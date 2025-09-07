@@ -44,5 +44,10 @@ public function subject()
     return $this->belongsTo(Subject::class);
 }
 
+// App\Models\Lecture.php
+public function attendances()
+{
+    return $this->hasMany(Attendance::class);
+}
 
 }

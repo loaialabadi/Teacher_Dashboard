@@ -25,15 +25,18 @@ class AttendanceController extends Controller
     }
 
     // 2. عرض نموذج تسجيل الحضور والغياب لمحاضرة معينة
-    public function create(Lecture $lecture)
-    {
-        $students = $lecture->group->students;
-        $teacher = $lecture->group->teacher;
+public function create(Teacher $teacher, Lecture $lecture)
+{
+    $students = $lecture->group->students;
+    $teacher = $lecture->group->teacher;
 
-        $attendances = Attendance::where('lecture_id', $lecture->id)->get()->keyBy('student_id');
+    $attendances = Attendance::where('lecture_id', $lecture->id)
+        ->get()
+        ->keyBy('student_id');
 
-        return view('teacher.attendance.create', compact('lecture', 'students', 'attendances', 'teacher'));
-    }
+    return view('teacher.attendance.create', compact('lecture', 'students', 'attendances', 'teacher'));
+}
+
 
     // 3. حفظ بيانات الحضور والغياب لمجموعة (تستخدم عند اختيار مجموعة)
     public function storeForGroup(Request $request, Group $group)
@@ -75,7 +78,10 @@ class AttendanceController extends Controller
                 );
             }
 
-            return redirect()->route('attendances.create', $lecture->id)->with('success', 'تم تسجيل الحضور بنجاح.');
+return redirect()->route('teachers.lectures.attendance.create', [
+    'teacher' => $lecture->teacher_id,
+    'lecture' => $lecture->id,
+])->with('success', 'تم تسجيل الحضور بنجاح.');
         }
 
     // 5. عرض تقرير الحضور لمحاضرة معينة
