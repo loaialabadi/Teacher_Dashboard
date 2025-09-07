@@ -10,6 +10,7 @@ use App\Http\Controllers\Teacher\Attendance\AttendanceController;
 use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\Teacher\TeachersController;
 use App\Http\Controllers\Teacher\TeacherController;
+use App\Http\Controllers\Teacher\Payments\PaymentsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ParentController;
@@ -63,6 +64,11 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
     Route::get('/dashboard', [TeachersController::class, 'dashboard'])->name('dashboard');
 
     
+Route::prefix('payments')->name('payments.')->group(function () {
+        Route::get('payments/{student_id}', [PaymentsController::class, 'index'])->name('index');
+        Route::post('payments/{student_id}', [PaymentsController::class, 'store'])->name('store');
+    });
+
     // المجموعات
     Route::prefix('groups')->name('groups.')->group(function () {
         Route::get('/', [GroupController::class, 'index'])->name('index');

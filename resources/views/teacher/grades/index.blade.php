@@ -22,33 +22,32 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($grades as $grade)
-                    <tr>
-                        <td>{{ $grade->name ?? '-' }}</td>
-                        <td>{{ \Carbon\Carbon::parse($grade->date)->format('Y-m-d') }}</td>
-                        <td>
-                            <a href="{{ route('teachers.grades.edit', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i> تعديل
-                            </a>
+@foreach($grades as $grade)
+    <tr>
+        <td>{{ $grade->name ?? '-' }}</td>
+        <td>{{ \Carbon\Carbon::parse($grade->date)->format('Y-m-d') }}</td>
+        <td>
+            <a href="{{ route('teachers.grades.edit', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i> تعديل
+            </a>
 
-                            <form action="{{ route('teachers.grades.destroy', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد من حذف هذا الفصل الدراسي؟')">
-                                    <i class="fas fa-trash"></i> حذف
-                                </button>
-                            </form>
+            <form action="{{ route('teachers.grades.destroy', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" method="POST" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد من حذف هذا الفصل الدراسي؟')">
+                    <i class="fas fa-trash"></i> حذف
+                </button>
+            </form>
 
-<a href="{{ route('teachers.show', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" class="btn btn-info">
-    <i class="fas fa-check-circle"></i> عرض الطلاب 
-</a>
-
-
-
-
-                        </td>
-                    </tr>
-                @endforeach
+            {{-- الطلاب والمدفوعات --}}
+            @foreach($grade->students as $student)
+                <a href="{{ route('teachers.payments.index', ['teacher' => $teacher->id, 'student_id' => $student->id]) }}" class="btn btn-sm btn-primary">
+                    💵 مدفوعات {{ $student->name }}
+                </a>
+            @endforeach
+        </td>
+    </tr>
+@endforeach
             </tbody>
         </table>
 

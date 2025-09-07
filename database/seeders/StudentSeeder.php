@@ -25,8 +25,8 @@ class StudentSeeder extends Seeder
         $this->command->info('👨‍👩‍👧‍👦 الآباء: ' . $parents->pluck('id')->implode(', '));
         $this->command->info('👨‍🏫 المدرسون: ' . $teachers->pluck('id')->implode(', '));
 
-        // إنشاء 20 طالب مع الربط بالآباء، الفصول، المعلمين، والمواد
-Student::factory(1000)->create()->each(function ($student) use ($parents, $teachers, $grades) {
+        // إنشاء 10 طالب مع الربط بالآباء، الفصول، المعلمين، والمواد
+Student::factory(10)->create()->each(function ($student) use ($parents, $teachers, $grades) {
     $student->update([
         'parent_id' => $parents->random()->id,
         'grade_id'  => $grades->random()->id,

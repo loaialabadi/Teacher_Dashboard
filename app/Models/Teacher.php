@@ -71,4 +71,10 @@ public function grades()
 }
 
 
+public function payments()
+{
+    return $this->hasMany(Payment::class);
+}
+
+
 }
