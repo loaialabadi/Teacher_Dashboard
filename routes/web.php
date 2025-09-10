@@ -64,10 +64,11 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
     Route::get('/dashboard', [TeachersController::class, 'dashboard'])->name('dashboard');
 
     
-Route::prefix('payments')->name('payments.')->group(function () {
-        Route::get('payments/{student_id}', [PaymentsController::class, 'index'])->name('index');
-        Route::post('payments/{student_id}', [PaymentsController::class, 'store'])->name('store');
+    Route::prefix('payments')->name('payments.')->group(function () {
+        Route::get('{student}', [PaymentsController::class, 'index'])->name('index');
+        Route::post('{student}', [PaymentsController::class, 'store'])->name('store');
     });
+
 
     // المجموعات
     Route::prefix('groups')->name('groups.')->group(function () {

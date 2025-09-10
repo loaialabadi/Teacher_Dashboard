@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 class StudentController extends Controller
 {
@@ -43,15 +44,38 @@ public function index(Request $request)
     }
 
     // عرض تفاصيل طالب مع مدرس معين
-    public function teacherDetails($studentId, $teacherId)
-    {
-        $student = Student::with(['groups' => function($q) use ($teacherId) {
-            $q->where('teacher_id', $teacherId)->with('subject', 'lectures');
-        }])->findOrFail($studentId);
+public function teacherDetails($studentId, $teacherId)
+{
+    // جلب الطالب مع المجموعات الخاصة بالمدرس، مع المواد والمحاضرات والحضور
+    $student = Student::with([
+        'groups' => function($q) use ($teacherId) {
+            $q->where('teacher_id', $teacherId)
+              ->with([
+                  'subject',
+                  'lectures' => function($lecQuery) {
+                      $lecQuery->with('attendances');
+                  }
+              ]);
+        }
+    ])->findOrFail($studentId);
 
-        $teacher = Teacher::findOrFail($teacherId);
-        $groups  = $student->groups;
+    $teacher = Teacher::findOrFail($teacherId);
+    $groups  = $student->groups;
 
-        return view('student.teacher-details', compact('student', 'teacher', 'groups'));
-    }
+    // جلب المدفوعات لهذا الطالب والمدرس للعام الحالي
+    $year = now()->year;
+    $months = [
+        'January','February','March','April','May','June',
+        'July','August','September','October','November','December'
+    ];
+
+    $payments = Payment::where('student_id', $student->id)
+        ->where('teacher_id', $teacher->id)
+        ->where('year', $year)
+        ->pluck('is_paid', 'month')
+        ->toArray();
+
+    return view('student.teacher-details', compact('student', 'teacher', 'groups', 'months', 'payments', 'year'));
+}
+
 }

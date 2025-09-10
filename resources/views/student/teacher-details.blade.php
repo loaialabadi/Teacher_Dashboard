@@ -8,6 +8,7 @@
 
     <hr>
 
+    {{-- جدول المحاضرات --}}
     <h5 class="mb-3">📘 جدول المحاضرات مع هذا المدرس:</h5>
 
     @forelse($groups as $group)
@@ -21,7 +22,6 @@
                     <ul class="list-group list-group-flush mt-2">
                         @forelse($group->lectures as $lec)
                             @php
-                                // جلب الحضور/الغياب للطالب
                                 $attendance = $lec->attendances->where('student_id', $student->id)->first();
                                 $dayName = \Carbon\Carbon::parse($lec->start_time)->translatedFormat('l');
                                 $date = \Carbon\Carbon::parse($lec->start_time)->format('Y-m-d');
@@ -61,6 +61,38 @@
     @empty
         <div class="alert alert-warning">❌ لا توجد مجموعات لهذا المدرس</div>
     @endforelse
+
+    <hr>
+
+    {{-- جدول المدفوعات --}}
+    <h5 class="mb-3">💰 حالة المدفوعات للعام {{ $year }}:</h5>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    @foreach($months as $month)
+                        <th class="text-center">{{ $month }}</th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    @foreach($months as $month)
+                        @php
+                            $paid = $payments[$month] ?? false;
+                        @endphp
+                        <td class="text-center">
+                            @if($paid)
+                                <span class="badge bg-success">✅ مدفوع</span>
+                            @else
+                                <span class="badge bg-danger">❌ غير مدفوع</span>
+                            @endif
+                        </td>
+                    @endforeach
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <a href="{{ route('students.show', $student->id) }}" class="btn btn-secondary mt-3">
         ⬅ رجوع للمدرسين

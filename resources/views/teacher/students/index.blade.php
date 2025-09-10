@@ -40,10 +40,11 @@
                     <td>
                         <a href="{{ route('teachers.students.edit', [$teacher->id, $student->id]) }}" class="btn btn-primary btn-sm">تعديل</a>
 
-<form action="{{ route('teachers.payments.store', ['teacher' => $teacher->id, 'student' => $student->id]) }}" method="POST">
-    @csrf
-    <button type="submit" class="btn btn-warning btn-sm">إدارة الدفع</button>
-</form> 
+<a href="{{ route('teachers.payments.index', ['teacher' => $teacher->id, 'student' => $student->id]) }}" 
+   class="btn btn-warning btn-sm">
+   إدارة الدفع
+</a>
+</td>
 
                         <a href="{{ route('teachers.students.show', [$teacher->id, $student->id]) }}" class="btn btn-info btn-sm">عرض</a>
                         <form action="{{ route('teachers.students.destroy', [$teacher->id, $student->id]) }}" method="POST" style="display:inline-block;">
