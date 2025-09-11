@@ -39,24 +39,16 @@ class TeacherController extends Controller
 public function showGrades($teacherId)
 {
     $teacher = Teacher::findOrFail($teacherId);
-    $grades = Grade::all();
 
-    // جهز كل فصل مع عدد الطلاب
-    $gradesWithCount = $grades->map(function($grade) use ($teacher) {
-        $grade->students_count = Student::where('grade_id', $grade->id)
-            ->whereHas('studentTeacher', function($q) use ($teacher) {
-                $q->where('teacher_id', $teacher->id);
-            })
-            ->count();
-        return $grade; // ارجع الكائن نفسه بعد اضافة students_count
-    });
+    // رجع الفصول الخاصة بالمدرس فقط
+    $grades = $teacher->grades()->withCount(['students' => function($q) use ($teacher) {
+        $q->whereHas('studentTeacher', function($q2) use ($teacher) {
+            $q2->where('teacher_id', $teacher->id);
+        });
+    }])->get();
 
-    return view('teacher.students.grades', [
-        'teacher' => $teacher,
-        'grades' => $gradesWithCount
-    ]);
+    return view('teacher.students.grades', compact('teacher', 'grades'));
 }
-
 
 
 
