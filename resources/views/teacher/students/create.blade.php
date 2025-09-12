@@ -1,4 +1,4 @@
-@extends('layouts.index')
+@extends('layouts.teacher')
 
 @section('content')
 <div class="container mt-4">
@@ -14,7 +14,7 @@
         </div>
     @endif
 
-    <form action="{{ route('teachers.students.store', $teacher->id) }}" method="POST">
+<form action="{{ route('teachers.students.store', ['teacher' => $teacher->id, 'grade' => $grade->id]) }}" method="POST">
         @csrf
 
         <input type="hidden" name="teacher_id" value="{{ $teacher->id }}">
@@ -27,6 +27,15 @@
         <div class="mb-3">
             <label for="student_phone" class="form-label">رقم تليفون الطالب</label>
             <input type="text" name="phone" id="student_phone" class="form-control" required value="{{ old('phone') }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="gender" class="form-label">النوع</label>
+            <select name="gender" id="gender" class="form-select" required>
+                <option value="">-- اختر النوع --</option>
+                <option value="ذكر" {{ old('gender') == 'ذكر' ? 'selected' : '' }}>ذكر</option>
+                <option value="أنثى" {{ old('gender') == 'أنثى' ? 'selected' : '' }}>أنثى</option>
+            </select>
         </div>
 
         <div class="mb-3">
@@ -58,18 +67,6 @@
                 @foreach ($teacher->grades as $grade)
                     <option value="{{ $grade->id }}" {{ old('grade_id') == $grade->id ? 'selected' : '' }}>
                         {{ $grade->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="group_id" class="form-label">اختر مجموعة (اختياري)</label>
-            <select name="group_id" id="group_id" class="form-select">
-                <option value="">-- بدون مجموعة --</option>
-                @foreach ($teacher->groups as $group)
-                    <option value="{{ $group->id }}" {{ old('group_id') == $group->id ? 'selected' : '' }}>
-                        {{ $group->name }}
                     </option>
                 @endforeach
             </select>

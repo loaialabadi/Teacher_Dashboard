@@ -78,12 +78,13 @@ class Student extends Authenticatable
     }
 
     // لو الطالب ممكن يدرس مع أكثر من معلم
-    public function teachers()
-    {
-        return $this->belongsToMany(Teacher::class, 'student_teacher')
-                    ->withPivot('subject_id')
-                    ->withTimestamps();
-    }
+
+public function teachers()
+{
+    return $this->belongsToMany(Teacher::class, 'student_teacher')
+                ->withPivot(['subject_id', 'grade_id', 'group_id'])
+                ->withTimestamps();
+}
 
     // الحصص/المحاضرات
     public function lectures()
@@ -112,5 +113,7 @@ class Student extends Authenticatable
 {
     return $this->hasMany(Payment::class);
 }
+
+
 
 }

@@ -43,25 +43,32 @@
     </div>
 
     {{-- المجموعات الحالية --}}
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h4 class="mb-3">📋 المجموعات الحالية</h4>
-            @isset($groups)
-                @if($groups->isEmpty())
-                    <p class="text-muted">لا توجد مجموعات حالياً.</p>
-                @else
-                    <ul class="list-group list-group-flush">
-                        @foreach($groups as $group)
-                            <li class="list-group-item d-flex align-items-center">
+{{-- المجموعات الحالية --}}
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h4 class="mb-3">📋 المجموعات الحالية</h4>
+        @isset($groups)
+            @if($groups->isEmpty())
+                <p class="text-muted">🚫 لا توجد مجموعات حالياً.</p>
+            @else
+                <ul class="list-group list-group-flush">
+                    @foreach($groups as $group)
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
                                 <i class="fas fa-layer-group text-primary me-2"></i>
-                                {{ $group->name }}
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-            @endisset
-        </div>
+                                <a href="{{ route('teachers.groups.show', ['teacher' => $teacher->id, 'group' => $group->id]) }}" class="text-decoration-none">
+                                    {{ $group->name }}
+                                </a>
+                            </div>
+                            <span class="badge bg-success">👨‍🎓 {{ $group->students->count() }} طالب</span>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        @endisset
     </div>
+</div>
+
 
 </div>
 @endsection

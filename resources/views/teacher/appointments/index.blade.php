@@ -1,4 +1,4 @@
-@extends('layouts.index')
+@extends('layouts.teacher')
 
 @section('content')
 <h1>الحصص الخاصة بالمعلم: {{ $teacher->name }}</h1>

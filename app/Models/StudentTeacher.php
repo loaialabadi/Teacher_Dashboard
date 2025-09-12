@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class StudentTeacher extends Model
 {
+
+
+    protected $fillable = [
+    'student_id',
+    'teacher_id',
+    'subject_id',
+    'grade_id',
+    'group_id',
+];
+
     protected $table = 'student_teacher'; // إذا كان اسم الجدول مختلفًا
 
     public function student()
@@ -22,4 +32,5 @@ class StudentTeacher extends Model
     {
         return $this->belongsTo(Subject::class);
     }
+    
 }

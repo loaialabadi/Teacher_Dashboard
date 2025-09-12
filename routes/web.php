@@ -144,8 +144,9 @@ Route::get('/grade/{grade}', [TeacherController::class, 'showStudentsByGrade'])-
 
 
     // إنشاء طالب جديد
-    Route::get('/create', [TeacherController::class, 'createStudent'])->name('create');
-    Route::post('/', [TeacherController::class, 'storeStudent'])->name('store');
+Route::get('/grade/{grade}/create', [TeacherController::class, 'createStudent'])->name('create');
+// إضافة طالب جديد داخل فصل معين
+Route::post('/grade/{grade}', [TeacherController::class, 'storeStudent'])->name('store');
 
     // عرض طالب معين
     Route::get('/{student}', [TeacherController::class, 'showStudent'])->name('show');

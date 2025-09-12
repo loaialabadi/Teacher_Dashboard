@@ -11,6 +11,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('name');
             $table->string('phone')->nullable();
+            //gender
+            $table->enum('gender',['male' ,'female'])->default('male');
 
             // المفتاح الأجنبي المرتبط بـ school_grades
             $table->foreignId('grade_id')->nullable()->constrained('grades')->onDelete('cascade');

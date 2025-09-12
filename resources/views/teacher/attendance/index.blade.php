@@ -1,4 +1,4 @@
-@extends('layouts.index')
+@extends('layouts.teacher')
 
 @section('content')
 <h3 class="mt-4">المحاضرات</h3>

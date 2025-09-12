@@ -27,25 +27,32 @@ class TeachersController extends Controller
     }
 
     // ✅ تخزين معلم جديد مع التحقق من البيانات
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'       => 'required|string|max:255',
-            'phone'      => 'nullable|string',
-                    'user_id' => 'required|exists:users,id',
+public function store(Request $request)
+{
+    $request->validate([
+        'name'     => 'required|string|max:255',
+        'phone'    => 'nullable|string|max:20',
+        'email'    => 'required|email|unique:users,email',
+        'password' => 'required|min:6',
+    ]);
 
-        ]);
-        Teacher::create([
-            'name' => $request->name,
-            'phone' => $request->phone,
-    'user_id' => $request->user_id,  // هذه قيمة المستخدم المختار من الفورم
-        ]);
+    // 1️⃣ إنشاء مستخدم في جدول users
+    $user = User::create([
+        'name'     => $request->name,
+        'email'    => $request->email,
+        'password' => bcrypt($request->password),
+    ]);
 
+    // 2️⃣ إنشاء معلم مربوط بالمستخدم
+    Teacher::create([
+        'name'    => $request->name,
+        'phone'   => $request->phone,
+        'user_id' => $user->id,
+    ]);
 
-      return redirect()->route('teacher.teachers.index')->with('success', 'تم إضافة المعلم بنجاح.');
+    return redirect()->route('teacher.teachers.index')->with('success', 'تم إضافة المعلم بنجاح.');
+}
 
-    }       
-    
 
     // ✅ عرض نموذج تعديل معلم محدد
     public function edit(Teacher $teacher)

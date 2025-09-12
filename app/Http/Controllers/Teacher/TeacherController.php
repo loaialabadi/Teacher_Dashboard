@@ -18,7 +18,7 @@ class TeacherController extends Controller
     {
         $teacher = Teacher::with(['students', 'lectures', 'groups'])->findOrFail($id);
         $groups = $teacher->groups;
-        $groupId = $groups->first()?->id;
+    $groups   = $teacher->groups;   // كل الجروبات
         $lectures = $teacher->lectures->sortBy('start_time');
 
         return view('teacher.teacher.dashboard', compact('teacher', 'lectures', 'groupId', 'groups'));
@@ -57,14 +57,12 @@ public function showStudentsByGrade($teacherId, $gradeId, $subjectId = null)
     $teacher = Teacher::findOrFail($teacherId);
     $grade = Grade::findOrFail($gradeId);
 
-    $students = Student::where('grade_id', $grade->id)
-        ->whereHas('studentTeacher', function($q) use ($teacher, $subjectId) {
-            $q->where('teacher_id', $teacher->id);
-            if ($subjectId) {
-                $q->where('subject_id', $subjectId);
-            }
+    $students = $teacher->students()
+        ->wherePivot('grade_id', $grade->id) // جلب الطلاب حسب pivot
+        ->when($subjectId, function($q) use ($subjectId) {
+            $q->wherePivot('subject_id', $subjectId);
         })
-        ->with(['parent', 'groups', 'studentTeacher' => function($q) use ($teacher, $subjectId) {
+        ->with(['parent', 'studentTeacher' => function($q) use ($teacher, $subjectId) {
             $q->where('teacher_id', $teacher->id);
             if ($subjectId) {
                 $q->where('subject_id', $subjectId);
@@ -79,61 +77,48 @@ public function showStudentsByGrade($teacherId, $gradeId, $subjectId = null)
 
 
     // عرض نموذج إضافة طالب جديد
-    public function createStudent(Teacher $teacher)
+    public function createStudent(Teacher $teacher, Grade $grade)
     {
-        return view('teacher.students.create', compact('teacher'));
+        return view('teacher.students.create', compact('teacher','grade'));
     }
 
-    // تخزين طالب جديد
-    public function storeStudent(Request $request, Teacher $teacher)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'parent_name' => 'required|string|max:255',
-            'parent_phone' => 'required|string|max:20',
-            'subject_id' => 'required|exists:subjects,id',
-            'grade_id' => 'required|exists:grades,id',
-            'group_id' => 'nullable|exists:groups,id',
-        ]);
+public function storeStudent(Request $request, Teacher $teacher, Grade $grade)
+{
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'phone' => 'required|string|max:20',
+        'gender' => 'required|string|in:ذكر,أنثى',
+        'parent_name' => 'required|string|max:255',
+        'parent_phone' => 'required|string|max:20',
+        'subject_id' => 'required|exists:subjects,id',
+        'grade_id' => 'required|exists:grades,id',
+    ]);
 
-        $parent = ParentModel::firstOrCreate(
-            ['phone' => $data['parent_phone']],
-            ['name' => $data['parent_name'], 'password' => bcrypt('defaultpassword123')]
-        );
+    $parent = ParentModel::firstOrCreate(
+        ['phone' => $data['parent_phone']],
+        ['name' => $data['parent_name'], 'password' => bcrypt('defaultpassword123')]
+    );
 
-        $student = Student::create([
-            'name' => $data['name'],
-            'phone' => $data['phone'],
-            'grade_id' => $data['grade_id'],
-            'parent_id' => $parent->id,
-        ]);
+    $student = Student::create([
+        'name'      => $data['name'],
+        'phone'     => $data['phone'],
+        'gender'    => $data['gender'],
+        'grade_id'  => $grade->id,
+        'parent_id' => $parent->id,
+    ]);
 
-        $teacher->students()->attach($student->id, [
-            'subject_id' => $data['subject_id'],
-            'grade_id' => $data['grade_id'],
-        ]);
+    // ربط الطالب بالمعلم والفصل فقط بدون group_id
+$teacher->students()->attach($student->id, [
+    'subject_id' => $data['subject_id'],
+    'grade_id'   => $grade->id,
+    'group_id'   => null,
+]);
 
-        if ($data['group_id']) {
-            $student->groups()->attach($data['group_id']);
-        } else {
-            $group = Group::firstOrCreate([
-                'teacher_id' => $teacher->id,
-                'subject_id' => $data['subject_id'],
-                'grade_id' => $data['grade_id'],
-            ]);
-            $student->groups()->attach($group->id);
-        }
+    return redirect()->route('teachers.students.grade', [$teacher->id, $grade->id])
+        ->with('success', 'تم إضافة الطالب وربطه بالمعلم والفصل بنجاح');
+}
 
-        return redirect()->route('teachers.students.index', $teacher->id)
-            ->with('success', 'تم إضافة الطالب وربطه بالمدرس وولي الأمر بنجاح');
-    }
 
-    // عرض بيانات طالب معين
-    public function showStudent(Teacher $teacher, Student $student)
-    {
-        return view('teacher.students.show', compact('teacher', 'student'));
-    }
 
 
     // تعديل طالب

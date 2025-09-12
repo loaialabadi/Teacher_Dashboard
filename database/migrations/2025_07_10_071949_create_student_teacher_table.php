@@ -13,16 +13,18 @@ class CreateStudentTeacherTable extends Migration
             $table->unsignedBigInteger('teacher_id');
             $table->unsignedBigInteger('subject_id');
             $table->unsignedBigInteger('grade_id');
+            $table->unsignedBigInteger('group_id')->nullable();
             $table->timestamps();
 
             $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
             $table->foreign('teacher_id')->references('id')->on('teachers')->onDelete('cascade');
             $table->foreign('subject_id')->references('id')->on('subjects')->onDelete('cascade');
             $table->foreign('grade_id')->references('id')->on('grades')->onDelete('cascade');
+            $table->foreign('group_id')->references('id')->on('groups')->onDelete('set null');
 
-            $table->unique(['student_id', 'teacher_id', 'subject_id']); // أو حسب منطقك للتكرار
-        });
-    }
+            $table->unique(['student_id', 'teacher_id', 'subject_id']);
+        }); // <- هذا القوس كان موجود
+    } // <- هنا يغلق الدالة up
 
     public function down()
     {
