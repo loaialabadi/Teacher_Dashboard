@@ -30,18 +30,26 @@ public function index(Request $request)
 }
 
     // عرض تفاصيل طالب معين (مع المدرسين المرتبطين بيه)
-    public function show($id)
-    {
-        $student = Student::with([
-            'parent',
-            'grade',
-            'groups.subject',
-            'groups.teacher',
-            'groups.lectures',
-        ])->findOrFail($id);
+    // public function show($id)
+    // {
+    //     $student = Student::with([
+    //         'parent',
+    //         'grade',
+    //         'groups.subject',
+    //         'groups.teacher',
+    //         'groups.lectures',
+    //     ])->findOrFail($id);
 
-        return view('student.show', compact('student'));
-    }
+    //     return view('student.show', compact('student'));
+    // }
+public function show($id)
+{
+    $student = Student::with(['parent', 'grade', 'teachers'])->findOrFail($id);
+
+    $teachers = $student->teachers; // كل المدرسين المرتبطين بالطالب مباشرة
+
+    return view('student.show', compact('student', 'teachers'));
+}
 
     // عرض تفاصيل طالب مع مدرس معين
 public function teacherDetails($studentId, $teacherId)

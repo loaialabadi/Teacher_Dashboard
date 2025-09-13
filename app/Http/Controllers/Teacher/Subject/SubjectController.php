@@ -59,6 +59,6 @@ public function destroy(Teacher $teacher, Subject $subject)
 {
     $teacher->subjects()->detach($subject->id);
 
-    return redirect()->route('subjects.index', $teacher)->with('success', 'تم حذف المادة بنجاح.');
+    return redirect()->route('teachers.subjects.index', $teacher)->with('success', 'تم حذف المادة بنجاح.');
 }
 }

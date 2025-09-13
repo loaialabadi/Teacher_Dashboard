@@ -66,10 +66,11 @@ class Student extends Authenticatable
     }
 
     // لو الطالب ممكن ينتمي لأكثر من مجموعة
-    public function groups()
-    {
-        return $this->belongsToMany(Group::class, 'group_student');
-    }
+public function groups()
+{
+    return $this->belongsToMany(Group::class, 'group_student')->with('teacher', 'subject');
+}
+
 
     // علاقة مع المعلم الأساسي (إن وجد)
     public function teacher()

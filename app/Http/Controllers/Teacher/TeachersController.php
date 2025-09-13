@@ -8,6 +8,7 @@ use App\Models\Lecture;
 use Illuminate\Http\Request;
 use App\Models\User;
 
+use Illuminate\Support\Facades\Hash;
 class TeachersController extends Controller
 {
     // ✅ عرض جميع المعلمين مع المادة الخاصة بهم
@@ -50,7 +51,7 @@ public function store(Request $request)
         'user_id' => $user->id,
     ]);
 
-    return redirect()->route('teacher.teachers.index')->with('success', 'تم إضافة المعلم بنجاح.');
+    return redirect()->route('teachers.index')->with('success', 'تم إضافة المعلم بنجاح.');
 }
 
 
@@ -62,27 +63,42 @@ public function store(Request $request)
     }
 
     // ✅ تحديث بيانات معلم محدد
-    public function update(Request $request, $id)
-    {
-        $teacher = Teacher::findOrFail($id);
 
-        $request->validate([
-            'name'       => 'required|string|max:255',
-            'email'      => 'required|email|unique:teachers,email,' . $teacher->id,
-            'phone'      => 'nullable|string|max:20',
-            'subject_id' => 'required|exists:subjects,id',
-        ]);
 
-        $teacher->update($request->only(['name', 'email', 'phone', 'subject_id']));
+        public function update(Request $request, $id)
+        {
+            $teacher = Teacher::findOrFail($id);
 
-        return redirect()->route('teachers.index')->with('success', 'تم تحديث بيانات المعلم بنجاح.');
-    }
+            $request->validate([
+                'name'       => 'required|string|max:255',
+                'email'      => 'required|email|unique:users,email,' . $teacher->user_id,
+                'phone'      => 'nullable|string|max:20',
+                'password'   => 'nullable|min:6',
+            ]);
+
+            // تحديث teacher (من غير باسورد)
+            $teacher->update([
+                'name'       => $request->name,
+                'phone'      => $request->phone,
+            ]);
+
+            // تحديث user المرتبط
+            $teacher->user->update([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => $request->filled('password') 
+                                ? Hash::make($request->password) 
+                                : $teacher->user->password,
+            ]);
+
+            return redirect()->route('teachers.index')->with('success', 'تم تحديث بيانات المعلم بنجاح.');
+        }
 
     // ✅ حذف معلم
     public function destroy(Teacher $teacher)
     {
         $teacher->delete();
-        return redirect()->route('teacher.teachers.index')->with('success', 'تم حذف المعلم بنجاح');
+        return redirect()->route('teachers.index')->with('success', 'تم حذف المعلم بنجاح');
     }
 
     // ✅ لوحة تحكم المعلم

@@ -6,9 +6,35 @@ use App\Models\Lecture;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Grade;
+use App\Models\Group;
 
 class LectureController extends Controller
 {
+
+
+public function groups(Teacher $teacher, Grade $grade)
+{
+    $groups = $teacher->groups()->where('grade_id', $grade->id)->get();
+    return view('teacher.lectures.by_groups', compact('teacher', 'grade', 'groups'));
+}
+
+
+
+public function byGroup(Teacher $teacher, Grade $grade, Group $group)
+{
+    // جلب المحاضرات الخاصة بالمجموعة
+    $lectures = $group->lectures()->with('subject')->get();
+    return view('teacher.lectures.by_group', compact('teacher', 'grade', 'group', 'lectures'));
+}
+
+    public function grades(Teacher $teacher)
+    {
+        $grades = $teacher->grades()->get();
+        return view('teacher.lectures.by_grades', compact('teacher', 'grades'));
+    }
+
+
 
 public function index($teacher_id)
 {
@@ -35,52 +61,47 @@ public function index($teacher_id)
 }
 
 
-public function create(Request $request, $teacher_id)
+public function create($teacherId)
 {
-$teacher = Teacher::with('groups.subject', 'groups.grade')->findOrFail($teacher_id);
+    $teacher = Teacher::findOrFail($teacherId);
 
-    $selectedGroup = null;
-    $selectedSubjectName = null;
+    // اختر أول مجموعة مرتبطة بالمعلم تلقائيًا
+    $selectedGroup = $teacher->groups()->with('subject', 'grade')->first();
 
-    if ($request->has('group_id')) {
-        $selectedGroup = $teacher->groups->where('id', $request->group_id)->first();
-        if ($selectedGroup && $selectedGroup->subject) {
-            $selectedSubjectName = $selectedGroup->subject->name;
-        }
+    if (!$selectedGroup) {
+        // إذا لم توجد مجموعة
+        return view('teacher.lectures.create', compact('teacher', 'selectedGroup'));
     }
+
+    $selectedSubjectName = $selectedGroup->subject->name;
 
     return view('teacher.lectures.create', compact('teacher', 'selectedGroup', 'selectedSubjectName'));
 }
 
+public function store(Request $request, $teacher_id)
+{
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'start_time' => 'required|date',
+        'end_time' => 'required|date|after:start_time',
+        'group_id' => 'required|exists:groups,id',
+        'subject_id' => 'required|exists:subjects,id',
+    ]);
 
-        public function store(Request $request, $teacher_id)
-        {
-            $request->merge(['teacher_id' => $teacher_id]);
+    Lecture::create([
+        'group_id' => $validated['group_id'],
+        'subject_id' => $validated['subject_id'],
+        'teacher_id' => $teacher_id,
+        'title' => $validated['title'],
+        'description' => $validated['description'] ?? null,
+        'start_time' => $validated['start_time'],
+        'end_time' => $validated['end_time'],
+    ]);
 
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'start_time' => 'required|date',
-                'end_time' => 'required|date|after:start_time',
-                'group_id' => 'required|exists:groups,id',
-                'subject_id' => 'required|exists:subjects,id',
-                'teacher_id' => 'required|exists:teachers,id',
-            ]);
-
-            Lecture::create([
-                'group_id' => $validated['group_id'],
-                'subject_id' => $validated['subject_id'],
-                'teacher_id' => $teacher_id,
-                'title' => $validated['title'],
-                'description' => $validated['description'] ?? null,
-                'start_time' => $validated['start_time'],
-                'end_time' => $validated['end_time'],
-            ]);
-
-            return redirect()->route('teachers.lectures.index', $teacher_id)->with('success', 'تمت إضافة المحاضرة بنجاح.');
-        }
-
-
+    return redirect()->route('teachers.lectures.index', $teacher_id)
+                     ->with('success', 'تمت إضافة المحاضرة بنجاح.');
+}
 
 
     public function edit($teacher_id, Lecture $lecture)

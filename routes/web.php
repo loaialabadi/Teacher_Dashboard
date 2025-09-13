@@ -78,6 +78,8 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
         Route::get('/{group}', [GroupController::class, 'show'])->name('show');
         Route::get('/{group}/edit', [GroupController::class, 'edit'])->name('edit');
         Route::put('/{group}', [GroupController::class, 'update'])->name('update');
+// مجموعات فصل معين
+Route::get('grade/{grade}', [GroupController::class, 'groupsByGrade'])->name('by-grade');
 
         // نقل الطلاب
         Route::get('{sourceGroup}/transfer', [GroupController::class, 'transferForm'])->name('transfer.form');
@@ -107,7 +109,15 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
         Route::get('/{lecture}/edit', [LectureController::class, 'edit'])->name('edit');
         Route::put('/{lecture}', [LectureController::class, 'update'])->name('update');
         Route::delete('/{lecture}', [LectureController::class, 'destroy'])->name('destroy');
+    Route::get('grades', [LectureController::class, 'grades'])->name('bygrades'); // الفصول
+// عرض المجموعات الخاصة بفصل معين
+Route::get('grades/{grade}/groups', [LectureController::class, 'groups'])
+    ->name('bygrade.groups');
 
+
+// عرض محاضرات مجموعة معينة
+Route::get('/grades/{grade}/groups/{group}', [LectureController::class, 'byGroup'])
+    ->name('bygroup');
         // حضور المحاضرات
         Route::get('/{lecture}/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
         Route::post('/{lecture}/attendance', [AttendanceController::class, 'storeForLecture'])->name('attendance.store');

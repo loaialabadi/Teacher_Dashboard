@@ -92,7 +92,7 @@
       <i class="fas fa-users"></i> <span>عرض المجموعات</span>
     </a>
 
-    <a href="{{ route('teachers.lectures.index', $teacher->id) }}" class="{{ request()->routeIs('teachers.lectures.*') ? 'active' : '' }}">
+    <a href="{{ route('teachers.lectures.bygrades', $teacher->id) }}" class="{{ request()->routeIs('teachers.lectures.*') ? 'active' : '' }}">
       <i class="fas fa-chalkboard-teacher"></i> <span>عرض المحاضرات</span>
     </a>
 

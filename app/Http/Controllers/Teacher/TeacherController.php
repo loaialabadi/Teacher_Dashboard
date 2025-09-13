@@ -10,6 +10,7 @@ use App\Models\Group;
 use App\Models\Lecture;
 use Illuminate\Http\Request;
 use App\Models\Grade;
+use App\Models\Subject;
 
 class TeacherController extends Controller
 {
@@ -35,20 +36,20 @@ class TeacherController extends Controller
     }
 
     // عرض الطلاب المرتبطين بالمعلم
-// صفحة الفصول
 public function showGrades($teacherId)
 {
     $teacher = Teacher::findOrFail($teacherId);
 
-    // رجع الفصول الخاصة بالمدرس فقط
-    $grades = $teacher->grades()->withCount(['students' => function($q) use ($teacher) {
-        $q->whereHas('studentTeacher', function($q2) use ($teacher) {
-            $q2->where('teacher_id', $teacher->id);
-        });
-    }])->get();
+$grades = $teacher->grades->map(function($grade) use ($teacher) {
+    $grade->students_count = $teacher->students()
+        ->wherePivot('grade_id', $grade->id)
+        ->count();
+    return $grade;
+});
 
     return view('teacher.students.grades', compact('teacher', 'grades'));
 }
+
 
 
 
@@ -85,20 +86,22 @@ public function showStudentsByGrade($teacherId, $gradeId, $subjectId = null)
 public function storeStudent(Request $request, Teacher $teacher, Grade $grade)
 {
     $data = $request->validate([
-        'name' => 'required|string|max:255',
-        'phone' => 'required|string|max:20',
-        'gender' => 'required|string|in:ذكر,أنثى',
+        'name'        => 'required|string|max:255',
+        'phone'       => 'required|string|max:20',
+        'gender'      => 'required|string|in:ذكر,أنثى',
         'parent_name' => 'required|string|max:255',
-        'parent_phone' => 'required|string|max:20',
-        'subject_id' => 'required|exists:subjects,id',
-        'grade_id' => 'required|exists:grades,id',
+        'parent_phone'=> 'required|string|max:20',
+        'subject_id'  => 'required|exists:subjects,id',
+        'grade_id'    => 'required|exists:grades,id',
     ]);
 
+    // ولي الأمر
     $parent = ParentModel::firstOrCreate(
         ['phone' => $data['parent_phone']],
         ['name' => $data['parent_name'], 'password' => bcrypt('defaultpassword123')]
     );
 
+    // إنشاء الطالب
     $student = Student::create([
         'name'      => $data['name'],
         'phone'     => $data['phone'],
@@ -107,12 +110,14 @@ public function storeStudent(Request $request, Teacher $teacher, Grade $grade)
         'parent_id' => $parent->id,
     ]);
 
-    // ربط الطالب بالمعلم والفصل فقط بدون group_id
-$teacher->students()->attach($student->id, [
-    'subject_id' => $data['subject_id'],
-    'grade_id'   => $grade->id,
-    'group_id'   => null,
-]);
+    // ربط الطالب بالمعلم (في pivot teacher_student أو student_teacher)
+    $teacher->students()->attach($student->id, [
+        'subject_id' => $data['subject_id'],
+        'grade_id'   => $grade->id,
+        'group_id'   => null,
+    ]);
+
+
 
     return redirect()->route('teachers.students.grade', [$teacher->id, $grade->id])
         ->with('success', 'تم إضافة الطالب وربطه بالمعلم والفصل بنجاح');
@@ -124,9 +129,26 @@ $teacher->students()->attach($student->id, [
     // تعديل طالب
 public function editStudent(Teacher $teacher, Student $student)
 {
-    $teachers = Teacher::all(); // جلب كل المدرسين
-    $parents  = ParentModel::all(); // إذا كنت تستخدم قائمة أولياء الأمور
-    return view('teacher.students.edit', compact('teacher', 'student', 'teachers', 'parents'.'subjects'));
+    $parents  = ParentModel::all(); 
+
+    // المواد الخاصة بالمعلم
+    $subjects = Subject::whereIn(
+        'id',
+        $teacher->groups()->pluck('subject_id')->unique()
+    )->get();
+
+    // الفصول الخاصة بالمعلم
+    $grades = Grade::whereIn(
+        'id',
+        $teacher->groups()->pluck('grade_id')->unique()
+    )->get();
+
+    // المجموعات الخاصة بالمعلم
+    $groups = $teacher->groups;
+
+    return view('teacher.students.edit', compact(
+        'teacher', 'student', 'parents', 'subjects', 'grades', 'groups'
+    ));
 }
 
     public function updateStudent(Request $request, Teacher $teacher, Student $student)

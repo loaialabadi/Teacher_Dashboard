@@ -14,11 +14,30 @@ use Illuminate\Http\Request;
 class GroupController extends Controller
 {
     // عرض جميع المجموعات للمعلم
-    public function index(Teacher $teacher)
-    {
-        $groups = $teacher->groups()->with(['students', 'grade', 'subject'])->get();
-        return view('teacher.groups.index', compact('teacher', 'groups'));
-    }
+public function index(Teacher $teacher)
+{
+    // جلب الفصول الخاصة بالمعلم فقط
+    $grades = $teacher->grades()->get();
+
+    // جلب المجموعات الخاصة بالمعلم والتي تتبع الفصول الخاصة به فقط
+
+
+    return view('teacher.groups.index', compact('teacher', 'grades'));
+}
+
+
+
+
+public function groupsByGrade(Teacher $teacher, Grade $grade)
+{
+    // نجيب المجموعات الخاصة بالمعلم والفصل المحدد
+    $groups = $teacher->groups()
+        ->where('grade_id', $grade->id)
+        ->with(['students', 'subject'])
+        ->get();
+
+    return view('teacher.groups.by-grade', compact('teacher', 'grade', 'groups'));
+}
 
     // صفحة إنشاء مجموعة جديدة
     public function create($teacherId)
@@ -50,7 +69,7 @@ class GroupController extends Controller
 
         $group->students()->sync($request->student_ids);
 
-        return redirect()->route('teachers.groups.index', $teacherId)
+        return redirect()->route('teachers.groups.by-grade', [$teacherId, $group->grade_id])
                          ->with('success', 'تم إنشاء المجموعة بنجاح');
     }
 

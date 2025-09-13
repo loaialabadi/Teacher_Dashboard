@@ -12,26 +12,21 @@
 
     <hr>
 
-    <h4 class="mb-3">👨‍🏫 اختر المدرس لعرض تفاصيله</h4>
+<h4 class="mb-3">👨‍🏫 قائمة المدرسين</h4>
+<h4 class="mb-3">👨‍🏫 المدرسون المرتبطون بك</h4>
 
-    @php
-        $teachers = $student->groups->groupBy('teacher.id');
-    @endphp
-
-    @forelse($teachers as $teacherId => $groups)
-        @php $teacher = $groups->first()->teacher; @endphp
-
-        <div class="card mb-3 shadow-sm">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">👨‍🏫 {{ $teacher->name }}</h5>
-                <a href="{{ route('students.teacher.details', [$student->id, $teacher->id]) }}" class="btn btn-primary">
-                    عرض التفاصيل ➡
-                </a>
-            </div>
+@forelse($teachers as $teacher)
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">👨‍🏫 {{ $teacher->name }}</h5>
+            <a href="{{ route('students.teacher.details', [$student->id, $teacher->id]) }}" class="btn btn-primary">
+                عرض التفاصيل ➡
+            </a>
         </div>
-    @empty
-        <div class="alert alert-info text-center">❌ لا يوجد مدرسين مرتبطين بك حالياً</div>
-    @endforelse
+    </div>
+@empty
+    <div class="alert alert-info text-center">❌ لا يوجد مدرسين مرتبطين بك حالياً</div>
+@endforelse
 
     <a href="{{ route('students.index') }}" class="btn btn-secondary mt-3">⬅ رجوع</a>
 </div>
