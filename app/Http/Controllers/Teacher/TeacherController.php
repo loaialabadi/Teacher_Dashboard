@@ -92,7 +92,6 @@ public function storeStudent(Request $request, Teacher $teacher, Grade $grade)
         'parent_name' => 'required|string|max:255',
         'parent_phone'=> 'required|string|max:20',
         'subject_id'  => 'required|exists:subjects,id',
-        'grade_id'    => 'required|exists:grades,id',
     ]);
 
     // ولي الأمر
@@ -116,7 +115,6 @@ public function storeStudent(Request $request, Teacher $teacher, Grade $grade)
         'grade_id'   => $grade->id,
         'group_id'   => null,
     ]);
-
 
 
     return redirect()->route('teachers.students.grade', [$teacher->id, $grade->id])

@@ -19,6 +19,7 @@ class Student extends Authenticatable
         'subject_id',
         'school_grade_id',
         'group_id',
+        'grade_id',
     ];
 
     protected $hidden = ['password'];
@@ -42,10 +43,10 @@ class Student extends Authenticatable
     }
 
     // المرحلة/الفصل الدراسي
-    public function grade()
-    {
-        return $this->belongsTo(SchoolGrade::class, 'school_grade_id');
-    }
+    // public function grade()
+    // {
+    //     return $this->belongsTo(SchoolGrade::class, 'school_grade_id');
+    // }
 
     // المجموعة الحالية
     public function group()
@@ -93,6 +94,7 @@ public function teachers()
         return $this->belongsToMany(Lecture::class, 'lecture_student');
     }
 
+
     // مواعيد خاصة بالطالب
     public function appointments()
     {
@@ -100,10 +102,11 @@ public function teachers()
     }
 
     // لو عندك جدول student_grade للربط بين الطلاب والفصول
-    public function grades()
-    {
-        return $this->belongsToMany(Grade::class, 'student_grade');
-    }
+   public function grade()
+{
+    return $this->belongsTo(Grade::class);
+}
+
 
     public function studentTeacher()
     {

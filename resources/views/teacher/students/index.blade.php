@@ -18,6 +18,7 @@
             <th>هاتف ولي الأمر</th>
             <th>المعلم والمادة</th>
             <th>المجموعة</th>
+            <th>الفصل الدراسي</th>
             <th>إجراءات</th>
         </tr>
     </thead>
@@ -38,6 +39,7 @@
                     {{ $group->name }}
                 @endforeach
             </td>
+<td>{{ $student->grade->name ?? '-' }}</td>
             <td>
                 <a href="{{ route('teachers.students.edit', [$teacher->id, $student->id]) }}" class="btn btn-primary btn-sm">تعديل</a>
                 <a href="{{ route('teachers.payments.index', ['teacher' => $teacher->id, 'student' => $student->id]) }}" 
