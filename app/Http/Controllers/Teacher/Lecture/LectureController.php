@@ -65,18 +65,13 @@ public function create($teacherId)
 {
     $teacher = Teacher::findOrFail($teacherId);
 
-    // اختر أول مجموعة مرتبطة بالمعلم تلقائيًا
-    $selectedGroup = $teacher->groups()->with('subject', 'grade')->first();
+    // كل المجموعات الخاصة بالمعلم
+    $groups = $teacher->groups()->with('subject', 'grade')->get();
 
-    if (!$selectedGroup) {
-        // إذا لم توجد مجموعة
-        return view('teacher.lectures.create', compact('teacher', 'selectedGroup'));
-    }
-
-    $selectedSubjectName = $selectedGroup->subject->name;
-
-    return view('teacher.lectures.create', compact('teacher', 'selectedGroup', 'selectedSubjectName'));
+    return view('teacher.lectures.create', compact('teacher', 'groups'));
 }
+
+
 
 public function store(Request $request, $teacher_id)
 {
@@ -86,12 +81,14 @@ public function store(Request $request, $teacher_id)
         'start_time' => 'required|date',
         'end_time' => 'required|date|after:start_time',
         'group_id' => 'required|exists:groups,id',
-        'subject_id' => 'required|exists:subjects,id',
     ]);
 
+    // نجيب subject_id من المجموعة
+    $group = Group::with('subject')->findOrFail($validated['group_id']);
+
     Lecture::create([
-        'group_id' => $validated['group_id'],
-        'subject_id' => $validated['subject_id'],
+        'group_id' => $group->id,
+        'subject_id' => $group->subject->id,
         'teacher_id' => $teacher_id,
         'title' => $validated['title'],
         'description' => $validated['description'] ?? null,

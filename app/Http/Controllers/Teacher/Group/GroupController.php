@@ -187,4 +187,25 @@ public function groupsByGrade(Teacher $teacher, Grade $grade)
 
         return view('teacher.groups.show', compact('teacher', 'group'));
     }
+
+
+
+    public function showUnassignedStudents(Teacher $teacher, Group $group)
+{
+    // الطلاب اللي مش في أي مجموعة
+    $students = Student::whereDoesntHave('groups')->get();
+
+    return view('teacher.groups.add_students', compact('teacher', 'group', 'students'));
+}
+
+public function assignStudents(Request $request, Teacher $teacher, Group $group)
+{
+    $studentIds = $request->input('student_ids', []);
+
+    // اربط الطلاب بالمجموعة
+    $group->students()->attach($studentIds);
+
+    return redirect()->route('teachers.groups.show', [$teacher->id, $group->id])
+                     ->with('success', 'تم إضافة الطلاب بنجاح ✅');
+}
 }

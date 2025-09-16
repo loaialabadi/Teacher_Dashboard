@@ -4,32 +4,32 @@
 <div class="container my-4">
     <h2>➕ إضافة محاضرة</h2>
 
-    {{-- فورم حفظ المحاضرة مباشرة --}}
-    @if($selectedGroup)
+    @if($groups->count())
     <form method="POST" action="{{ route('teachers.lectures.store', $teacher->id) }}">
         @csrf
-        {{-- المجموعة والفصل والمادة --}}
-        <input type="hidden" name="group_id" value="{{ $selectedGroup->id }}">
-        <input type="hidden" name="subject_id" value="{{ $selectedGroup->subject->id }}">
 
+        {{-- اختيار المجموعة --}}
         <div class="mb-3">
-            <label>الفصل الدراسي:</label>
-            <input type="text" class="form-control" value="{{ $selectedGroup->grade->name }}" readonly>
+            <label for="group_id">اختر المجموعة:</label>
+            <select name="group_id" id="group_id" class="form-control" required>
+                <option value="">-- اختر مجموعة --</option>
+                @foreach($groups as $group)
+                    <option value="{{ $group->id }}">
+                        {{ $group->name }} - {{ $group->subject->name }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
-        <div class="mb-3">
-            <label>المادة:</label>
-            <input type="text" class="form-control" value="{{ $selectedGroup->subject->name }}" readonly>
-        </div>
-
+        {{-- باقي الفورم --}}
         <div class="mb-3">
             <label>عنوان المحاضرة:</label>
-            <input type="text" name="title" class="form-control" placeholder="أدخل عنوان المحاضرة" required>
+            <input type="text" name="title" class="form-control" required>
         </div>
 
         <div class="mb-3">
             <label>وصف المحاضرة:</label>
-            <textarea name="description" class="form-control" placeholder="أدخل وصف المحاضرة"></textarea>
+            <textarea name="description" class="form-control"></textarea>
         </div>
 
         <div class="mb-3">
@@ -45,9 +45,7 @@
         <button type="submit" class="btn btn-success">💾 حفظ المحاضرة</button>
     </form>
     @else
-    <div class="alert alert-warning">
-        لا توجد مجموعة متاحة لإضافة المحاضرة.
-    </div>
+    <div class="alert alert-warning">لا توجد مجموعة متاحة لإضافة المحاضرة.</div>
     @endif
 </div>
 @endsection

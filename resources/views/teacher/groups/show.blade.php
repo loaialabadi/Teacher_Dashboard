@@ -8,11 +8,12 @@
         <strong>اسم المدرس:</strong> {{ $teacher->name }}
     </div>
     <div class="mb-3">
-<strong>الفصل الدراسي :</strong> {{ $group->grade->name ?? 'غير محدد' }}
+        <strong>الفصل الدراسي :</strong> {{ $group->grade->name ?? 'غير محدد' }}
+    </div>
     <div class="mb-4">
-
         <strong>المادة:</strong> {{ $group->subject->name ?? 'غير محدد' }}
     </div>
+    <div class="mb-3">
         <strong>عدد الطلاب:</strong> {{ $group->students->count() }}
     </div>
 
@@ -40,6 +41,24 @@
         </table>
     @endif
 
-    <a href="{{ route('teachers.groups.index', $teacher->id) }}" class="btn btn-secondary mt-3">رجوع إلى المجموعات</a>
+    <div class="mt-3 d-flex gap-2">
+        {{-- زر الرجوع --}}
+        <a href="{{ route('teachers.groups.index', $teacher->id) }}" class="btn btn-secondary">
+            رجوع إلى المجموعات
+        </a>
+
+        {{-- زر نقل الطلاب --}}
+<a href="{{ route('teachers.groups.transfer.form', [
+    'teacher' => $teacher->id,
+    'sourceGroup' => $group->id
+]) }}" class="btn btn-warning">
+    🔄 نقل الطلاب
+</a>
+
+<a href="{{ route('teachers.groups.add-students.form', [$teacher->id, $group->id]) }}" 
+   class="btn btn-success">
+    ➕ إضافة طلاب جدد
+</a>
+    </div>
 </div>
 @endsection

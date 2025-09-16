@@ -11,6 +11,7 @@ use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\Teacher\TeachersController;
 use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\Teacher\Payments\PaymentsController;
+use App\Http\Controllers\Teacher\Quiz\QuizController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ParentController;
@@ -68,6 +69,7 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
         Route::get('{student}', [PaymentsController::class, 'index'])->name('index');
         Route::post('{student}', [PaymentsController::class, 'store'])->name('store');
     });
+        Route::resource('quizzes', QuizController::class);
 
 
     // المجموعات
@@ -79,7 +81,7 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
         Route::get('/{group}/edit', [GroupController::class, 'edit'])->name('edit');
         Route::put('/{group}', [GroupController::class, 'update'])->name('update');
 // مجموعات فصل معين
-Route::get('grade/{grade}', [GroupController::class, 'groupsByGrade'])->name('by-grade');
+        Route::get('grade/{grade}', [GroupController::class, 'groupsByGrade'])->name('by-grade');
 
         // نقل الطلاب
         Route::get('{sourceGroup}/transfer', [GroupController::class, 'transferForm'])->name('transfer.form');
@@ -88,6 +90,10 @@ Route::get('grade/{grade}', [GroupController::class, 'groupsByGrade'])->name('by
         // إضافة طالب
         Route::get('{group}/add-student', [GroupController::class, 'showAddStudentForm'])->name('add-student.form');
         Route::post('{group}/add-student', [GroupController::class, 'addStudentToGroup'])->name('add-student');
+
+        // الطلاب الغير منضمين لأي مجموعة
+Route::get('{group}/add-students', [GroupController::class, 'showUnassignedStudents'])->name('add-students.form');
+Route::post('{group}/add-students', [GroupController::class, 'assignStudents'])->name('add-students');
 
         // حضور المجموعة
         Route::get('{group}/attendance', [AttendanceController::class, 'groupAttendance'])->name('attendance.index');

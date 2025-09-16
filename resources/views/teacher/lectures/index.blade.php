@@ -3,21 +3,6 @@
 @section('content')
 <div class="container my-4">
 
-    {{-- اختيار المجموعة --}}
-    <form method="GET" action="{{ route('teachers.lectures.create', $teacher->id) }}" class="mb-4">
-        <label for="group_id" class="form-label">اختر المجموعة:</label>
-        <select name="group_id" id="group_id" class="form-select" onchange="this.form.submit()" required>
-            <option value="">اختر المجموعة</option>
-            @foreach($teacher->groups as $group)
-                @if ($group->subject)
-                    <option value="{{ $group->id }}" {{ request('group_id') == $group->id ? 'selected' : '' }}>
-                        {{ $group->name }} - {{ $group->subject->name }}
-                    </option>
-                @endif
-            @endforeach
-        </select>
-    </form>
-
     {{-- عنوان الصفحة --}}
     <h2 class="mb-4 text-center">📘 جدول محاضرات: {{ $teacher->name }}</h2>
 
@@ -36,6 +21,7 @@
                                 <th>المادة</th>
                                 <th>الوقت</th>
                                 <th>المجموعة</th>
+                                <th>الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,6 +32,17 @@
                                     <td>{{ $lecture->subject->name ?? '-' }}</td>
                                     <td>{{ \Carbon\Carbon::parse($lecture->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($lecture->end_time)->format('H:i') }}</td>
                                     <td>{{ $lecture->group->name ?? '-' }}</td>
+                                    <td>
+                                        {{-- روابط الحضور --}}
+                                        <a href="{{ route('teachers.lectures.attendance.create', ['teacher' => $teacher->id, 'lecture' => $lecture->id]) }}" 
+                                           class="btn btn-success btn-sm">
+                                           📝 تسجيل حضور
+                                        </a>
+                                        <a href="{{ route('teachers.lectures.attendance.report', ['teacher' => $teacher->id, 'lecture' => $lecture->id]) }}" 
+                                           class="btn btn-info btn-sm">
+                                           📊 تقرير
+                                        </a>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
