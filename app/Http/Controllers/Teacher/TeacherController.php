@@ -100,22 +100,32 @@ public function storeStudent(Request $request, Teacher $teacher, Grade $grade)
         ['name' => $data['parent_name'], 'password' => bcrypt('defaultpassword123')]
     );
 
-    // إنشاء الطالب
-    $student = Student::create([
-        'name'      => $data['name'],
-        'phone'     => $data['phone'],
-        'gender'    => $data['gender'],
-        'grade_id'  => $grade->id,
-        'parent_id' => $parent->id,
-    ]);
+    // 🔍 ابحث عن الطالب برقم الموبايل
+    $student = Student::firstOrCreate(
+        ['phone' => $data['phone']], // شرط البحث
+        [   // لو مش موجود هيعمل إنشاء
+            'name'      => $data['name'],
+            'gender'    => $data['gender'],
+            'grade_id'  => $grade->id,
+            'parent_id' => $parent->id,
+        ]
+    );
 
-    // ربط الطالب بالمعلم (في pivot teacher_student أو student_teacher)
-    $teacher->students()->attach($student->id, [
-        'subject_id' => $data['subject_id'],
-        'grade_id'   => $grade->id,
-        'group_id'   => null,
-    ]);
+    // ✅ تحقق لو الطالب مرتبط بالفعل بنفس المدرس + نفس المادة + نفس الفصل
+    $exists = $teacher->students()
+        ->wherePivot('student_id', $student->id)
+        ->wherePivot('subject_id', $data['subject_id'])
+        ->wherePivot('grade_id', $grade->id)
+        ->exists();
 
+    if (! $exists) {
+        // ربط الطالب بالمعلم
+        $teacher->students()->attach($student->id, [
+            'subject_id' => $data['subject_id'],
+            'grade_id'   => $grade->id,
+            'group_id'   => null,
+        ]);
+    }
 
     return redirect()->route('teachers.students.grade', [$teacher->id, $grade->id])
         ->with('success', 'تم إضافة الطالب وربطه بالمعلم والفصل بنجاح');
@@ -130,16 +140,11 @@ public function editStudent(Teacher $teacher, Student $student)
     $parents  = ParentModel::all(); 
 
     // المواد الخاصة بالمعلم
-    $subjects = Subject::whereIn(
-        'id',
-        $teacher->groups()->pluck('subject_id')->unique()
-    )->get();
+    $subjects = $teacher->subjects;
+
 
     // الفصول الخاصة بالمعلم
-    $grades = Grade::whereIn(
-        'id',
-        $teacher->groups()->pluck('grade_id')->unique()
-    )->get();
+    $grades = $teacher->grades;
 
     // المجموعات الخاصة بالمعلم
     $groups = $teacher->groups;
