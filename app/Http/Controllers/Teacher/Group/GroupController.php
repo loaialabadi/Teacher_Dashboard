@@ -202,10 +202,24 @@ public function assignStudents(Request $request, Teacher $teacher, Group $group)
 {
     $studentIds = $request->input('student_ids', []);
 
-    // اربط الطلاب بالمجموعة
-    $group->students()->attach($studentIds);
+    foreach ($studentIds as $studentId) {
+        $alreadyInGroup = \DB::table('student_teacher')
+            ->where('student_id', $studentId)
+            ->where('teacher_id', $teacher->id)
+            ->where('subject_id', $group->subject_id) // نفس المادة
+            ->exists();
+
+        if (! $alreadyInGroup) {
+            $group->students()->attach($studentId, [
+                'teacher_id' => $teacher->id,
+                'subject_id' => $group->subject_id,
+                'grade_id'   => $group->grade_id,
+            ]);
+        }
+    }
 
     return redirect()->route('teachers.groups.show', [$teacher->id, $group->id])
                      ->with('success', 'تم إضافة الطلاب بنجاح ✅');
 }
+
 }

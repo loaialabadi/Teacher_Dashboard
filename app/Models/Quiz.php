@@ -24,3 +24,4 @@ class Quiz extends Model
         return $this->hasMany(QuizResult::class);
     }
 }
+

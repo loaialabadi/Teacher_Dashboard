@@ -95,14 +95,13 @@
     <a href="{{ route('teachers.lectures.bygrades', $teacher->id) }}" class="{{ request()->routeIs('teachers.lectures.*') ? 'active' : '' }}">
       <i class="fas fa-chalkboard-teacher"></i> <span>عرض المحاضرات</span>
     </a>
-    
-    <a href="{{ route('teachers.quizzes.index', $teacher->id) }}" class="{{ request()->routeIs('teachers.quizzes.*') ? 'active' : '' }}">
-      <i class="fas fa-question-circle"></i> <span>الاختبارات</span>
-    </a>
 
-    <a href="{{ route('teachers.teacher.settings', $teacher->id) }}" class="{{ request()->routeIs('teachers.teacher.settings') ? 'active' : '' }}">
-      <i class="fas fa-cog"></i> <span>إعدادات المعلم</span>
-    </a>
+<a href="{{ route('teachers.groups.quizzes.index', $teacher->id) }}">
+    <i class="fas fa-list"></i> <span>المجموعات والكويزات</span>
+</a>
+
+
+
 
   </div>
 

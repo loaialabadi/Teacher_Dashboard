@@ -32,11 +32,12 @@ protected $fillable = [
         return $this->belongsTo(Teacher::class);
     }
 
-        public function students()
-    {
-        return $this->belongsToMany(Student::class, 'group_student');
-    }
-
+public function students()
+{
+    return $this->belongsToMany(Student::class, 'student_teacher')
+                ->withPivot(['teacher_id', 'subject_id', 'grade_id'])
+                ->withTimestamps();
+}
 
 public function schoolGrade()
 {

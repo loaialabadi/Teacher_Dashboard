@@ -2,34 +2,37 @@
 
 @section('content')
 <div class="container">
-    <h2>📑 الكويزات للمجموعة: {{ $group->name }}</h2>
+    <h2 class="mb-4">📚 مجموعات المعلم: {{ $teacher->name }}</h2>
 
-
-    <table class="table table-bordered">
-        <thead>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
             <tr>
-                <th>العنوان</th>
-                <th>الوصف</th>
-                <th>تاريخ الإضافة</th>
-                <th>التحكم</th>
+                <th>اسم المجموعة</th>
+                <th>الفصل</th>
+                <th>عدد الطلاب</th>
+                <th>العمليات</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($quizzes as $quiz)
+            @forelse($groups as $group)
                 <tr>
-                    <td>{{ $quiz->title }}</td>
-                    <td>{{ $quiz->description }}</td>
-                    <td>{{ $quiz->created_at->format('Y-m-d') }}</td>
+                    <td>{{ $group->name }}</td>
+                    <td>{{ $group->grade->name ?? '-' }}</td>
+                    <td>{{ $group->students->count() }}</td>
                     <td>
-                        <a href="{{ route('teachers.groups.quizzes.show', [$teacher, $group, $quiz]) }}" class="btn btn-sm btn-info">عرض</a>
-                        <a href="{{ route('teachers.groups.quizzes.edit', [$teacher, $group, $quiz]) }}" class="btn btn-sm btn-warning">تعديل</a>
-                        <form action="{{ route('teachers.groups.quizzes.destroy', [$teacher, $group, $quiz]) }}" method="POST" style="display:inline-block">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">حذف</button>
-                        </form>
+                        <a href="{{ route('teachers.groups.show', [$teacher->id, $group->id]) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> عرض
+                        </a>
+                        <a href="{{ route('teachers.groups.quizzes.by-group', [$teacher->id, $group->id]) }}" class="btn btn-info btn-sm">
+                            <i class="fas fa-clipboard-list"></i> الكويزات
+                        </a>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="4" class="text-center">لا توجد مجموعات بعد</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>

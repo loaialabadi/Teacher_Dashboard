@@ -69,10 +69,24 @@ Route::prefix('teachers/{teacher}')->name('teachers.')->group(function () {
         Route::get('{student}', [PaymentsController::class, 'index'])->name('index');
         Route::post('{student}', [PaymentsController::class, 'store'])->name('store');
     });
-        Route::resource('quizzes', QuizController::class);
+
+    
+        // Route::resource('quizzes', QuizController::class);
+
+Route::get('groups-quizzes', [QuizController::class, 'groupsWithQuizzes'])
+    ->name('groups.quizzes.index');
+
+Route::get('groups/{group}/quizzes/create', [QuizController::class, 'create'])
+    ->name('groups.quizzes.create');
+
+Route::post('groups/{group}/quizzes', [QuizController::class, 'store'])
+    ->name('groups.quizzes.store');
 
 
-    // المجموعات
+
+        Route::get('quizzes/{quiz}/results', [QuizController::class, 'results'])->name('quizzes.results');
+    Route::post('quizzes/{quiz}/results', [QuizController::class, 'storeResults'])->name('quizzes.results.store');
+
     Route::prefix('groups')->name('groups.')->group(function () {
         Route::get('/', [GroupController::class, 'index'])->name('index');
         Route::get('/create', [GroupController::class, 'create'])->name('create');
