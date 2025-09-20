@@ -34,8 +34,7 @@ protected $fillable = [
 
 public function students()
 {
-    return $this->belongsToMany(Student::class, 'student_teacher')
-                ->withPivot(['teacher_id', 'subject_id', 'grade_id'])
+    return $this->belongsToMany(Student::class, 'group_student')
                 ->withTimestamps();
 }
 

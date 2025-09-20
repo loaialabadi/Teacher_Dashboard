@@ -54,23 +54,15 @@ public function show($id)
     // عرض تفاصيل طالب مع مدرس معين
 public function teacherDetails($studentId, $teacherId)
 {
-    // جلب الطالب مع المجموعات الخاصة بالمدرس، مع المواد والمحاضرات والحضور
-    $student = Student::with([
-        'groups' => function($q) use ($teacherId) {
-            $q->where('teacher_id', $teacherId)
-              ->with([
-                  'subject',
-                  'lectures' => function($lecQuery) {
-                      $lecQuery->with('attendances');
-                  }
-              ]);
-        }
-    ])->findOrFail($studentId);
+$student = Student::with([
+    'groups.subject',
+    'groups.lectures.attendances'
+])->findOrFail($studentId);
+
+$groups = $student->groups->where('teacher_id', $teacherId);
 
     $teacher = Teacher::findOrFail($teacherId);
-    $groups  = $student->groups;
 
-    // جلب المدفوعات لهذا الطالب والمدرس للعام الحالي
     $year = now()->year;
     $months = [
         'January','February','March','April','May','June',
@@ -85,5 +77,6 @@ public function teacherDetails($studentId, $teacherId)
 
     return view('student.teacher-details', compact('student', 'teacher', 'groups', 'months', 'payments', 'year'));
 }
+
 
 }

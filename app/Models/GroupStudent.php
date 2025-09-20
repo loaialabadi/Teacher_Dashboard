@@ -17,7 +17,7 @@ class GroupStudent extends Model
         return $this->belongsTo(Student::class);
     }
 
-    // ✅ العلاقة مع المجموعة
+    // ✅ العلاقة مع المجموعةش
     public function group()
     {
         return $this->belongsTo(Group::class);

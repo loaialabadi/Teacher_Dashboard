@@ -52,39 +52,40 @@ public function groupsByGrade(Teacher $teacher, Grade $grade)
     }
 
     // حفظ مجموعة جديدة
-    public function store(Request $request, $teacherId)
-    {
-        $request->validate([
-            'group_name' => 'required|string|max:255',
-            'subject_id' => 'required|exists:subjects,id',
-            'grade_id' => 'required|exists:grades,id',
-        ]);
+public function store(Request $request, $teacherId)
+{
+    $request->validate([
+        'group_name' => 'required|string|max:255',
+        'subject_id' => 'required|exists:subjects,id',
+        'grade_id' => 'required|exists:grades,id',
+    ]);
 
-        $group = Group::create([
-            'name' => $request->group_name,
-            'teacher_id' => $teacherId,
-            'subject_id' => $request->subject_id,
-            'grade_id' => $request->grade_id,
-        ]);
+    $group = Group::create([
+        'name' => $request->group_name,
+        'teacher_id' => $teacherId,
+        'subject_id' => $request->subject_id,
+        'grade_id' => $request->grade_id,
+    ]);
 
-        $group->students()->sync($request->student_ids);
+    // فلترة الطلاب
+    $studentIds = $request->student_ids ?? [];
 
-        return redirect()->route('teachers.groups.by-grade', [$teacherId, $group->grade_id])
-                         ->with('success', 'تم إنشاء المجموعة بنجاح');
-    }
+    // هات الطلاب اللي بالفعل في مجموعة تابعة لنفس المدرس والمادة
+    $conflictedStudents = Student::whereIn('id', $studentIds)
+        ->whereHas('groups', function($q) use ($teacherId, $request) {
+            $q->where('teacher_id', $teacherId)
+              ->where('subject_id', $request->subject_id);
+        })->pluck('id')->toArray();
 
-    // صفحة تعديل المجموعة
-    public function edit($teacherId, $groupId)
-    {
-        $group = Group::with('students')->findOrFail($groupId);
-        $teacher = Teacher::findOrFail($teacherId);
-        $students = Student::all();
-        $subjects = $teacher->subjects;
-        $grades = $teacher->grades;
-        $lectures = $teacher->lectures;
+    // استبعدهم
+    $finalStudents = array_diff($studentIds, $conflictedStudents);
 
-        return view('teacher.groups.edit', compact('group', 'teacher', 'students', 'subjects', 'grades', 'lectures'));
-    }
+    // اربط الطلاب الباقيين
+    $group->students()->sync($finalStudents);
+
+    return redirect()->route('teachers.groups.by-grade', [$teacherId, $group->grade_id])
+                     ->with('success', 'تم إنشاء المجموعة بنجاح');
+}
 
     // تحديث بيانات المجموعة
     public function update(Request $request, $teacherId, $groupId)
@@ -147,25 +148,43 @@ public function groupsByGrade(Teacher $teacher, Grade $grade)
     }
 
     // إضافة طالب لمجموعة
-    public function addStudentToGroup(Request $request, $teacherId, $groupId)
-    {
-        $request->validate([
-            'student_id' => 'required|exists:students,id',
-        ]);
+public function addStudentToGroup(Request $request, $teacherId, $groupId)
+{
+    $request->validate([
+        'student_id' => 'required|exists:students,id',
+    ]);
 
-        $teacher = Teacher::findOrFail($teacherId);
-        $group = Group::where('id', $groupId)->where('teacher_id', $teacherId)->firstOrFail();
+    $group   = Group::where('id', $groupId)
+                    ->where('teacher_id', $teacherId)
+                    ->firstOrFail();
 
-        $studentId = $request->student_id;
+    $student = Student::findOrFail($request->student_id);
 
-        if ($group->students()->where('student_id', $studentId)->exists()) {
-            return redirect()->back()->with('info', 'الطالب موجود بالفعل في هذه المجموعة.');
-        }
+    // تحقق: الطالب أصلاً مربوط بالمدرس والمادة
+    $isAssigned = $student->teachers()
+        ->wherePivot('teacher_id', $teacherId)
+        ->wherePivot('subject_id', $group->subject_id)
+        ->exists();
 
-        $group->students()->attach($studentId);
-
-        return redirect()->back()->with('success', 'تم إضافة الطالب إلى المجموعة بنجاح.');
+    if (! $isAssigned) {
+        return back()->with('error', 'الطالب غير مرتبط بهذا المدرس/المادة.');
     }
+
+    // تحقق: الطالب مش موجود في مجموعة تانية مع نفس المدرس/المادة
+    $alreadyInGroup = $student->groups()
+        ->where('teacher_id', $teacherId)
+        ->where('subject_id', $group->subject_id)
+        ->exists();
+
+    if ($alreadyInGroup) {
+        return back()->with('info', 'الطالب موجود بالفعل في مجموعة أخرى لنفس المدرس/المادة.');
+    }
+
+    // إضافة الطالب للمجموعة
+    $group->students()->attach($student->id);
+
+    return back()->with('success', 'تم إضافة الطالب إلى المجموعة بنجاح.');
+}
 
     // عرض نموذج إضافة طلاب للمجموعة
     public function showAddStudentForm($teacherId, $groupId)
