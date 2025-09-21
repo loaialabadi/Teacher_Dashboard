@@ -102,8 +102,8 @@ public function storeStudent(Request $request, Teacher $teacher, Grade $grade)
 
     // 🔍 ابحث عن الطالب برقم الموبايل
     $student = Student::firstOrCreate(
-        ['phone' => $data['phone']], // شرط البحث
-        [   // لو مش موجود هيعمل إنشاء
+        ['phone' => $data['phone']],
+        [
             'name'      => $data['name'],
             'gender'    => $data['gender'],
             'grade_id'  => $grade->id,
@@ -111,21 +111,13 @@ public function storeStudent(Request $request, Teacher $teacher, Grade $grade)
         ]
     );
 
-    // ✅ تحقق لو الطالب مرتبط بالفعل بنفس المدرس + نفس المادة + نفس الفصل
-    $exists = $teacher->students()
-        ->wherePivot('student_id', $student->id)
-        ->wherePivot('subject_id', $data['subject_id'])
-        ->wherePivot('grade_id', $grade->id)
-        ->exists();
-
-    if (! $exists) {
-        // ربط الطالب بالمعلم
-        $teacher->students()->attach($student->id, [
+    // ✅ اربط الطالب بالمدرس/المادة/الصف في student_teacher
+    $teacher->students()->syncWithoutDetaching([
+        $student->id => [
             'subject_id' => $data['subject_id'],
             'grade_id'   => $grade->id,
-            'group_id'   => null,
-        ]);
-    }
+        ]
+    ]);
 
     return redirect()->route('teachers.students.grade', [$teacher->id, $grade->id])
         ->with('success', 'تم إضافة الطالب وربطه بالمعلم والفصل بنجاح');
@@ -173,13 +165,15 @@ public function editStudent(Teacher $teacher, Student $student)
     }
 
     // حذف الطالب
-    public function destroyStudent(Teacher $teacher, Student $student)
-    {
-        $student->delete();
+// حذف الطالب من مدرس معين فقط
+public function destroyStudent(Teacher $teacher, Student $student)
+{
+    // فك الارتباط بين المدرس والطالب من جدول student_teacher
+    $teacher->students()->detach($student->id);
 
-        return redirect()->route('teachers.students.index', $teacher->id)
-            ->with('success', 'تم حذف الطالب بنجاح');
-    }
+    return redirect()->route('teachers.students.index', $teacher->id)
+        ->with('success', 'تم إزالة الطالب من هذا المدرس فقط بنجاح');
+}
 
 
 

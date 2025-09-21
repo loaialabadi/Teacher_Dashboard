@@ -36,11 +36,13 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
+                $this->call([
+            StudentSeeder::class,
+        ]);
+
     }}
         // 4. ننشئ بيانات الطلاب مع الربط بالآباء والمعلمين والفصول
-        // $this->call([
-        //     StudentSeeder::class,
-        // ]);
+
 
         // 5. ننشئ بيانات المجموعات المرتبطة بالمعلمين والطلاب
         // $this->call([

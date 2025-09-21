@@ -54,12 +54,12 @@ public function show($id)
     // عرض تفاصيل طالب مع مدرس معين
 public function teacherDetails($studentId, $teacherId)
 {
-$student = Student::with([
-    'groups.subject',
-    'groups.lectures.attendances'
-])->findOrFail($studentId);
+    $student = Student::with([
+        'groups.subject',
+        'groups.lectures.attendances',
+    ])->findOrFail($studentId);
 
-$groups = $student->groups->where('teacher_id', $teacherId);
+    $groups = $student->groups->where('teacher_id', $teacherId);
 
     $teacher = Teacher::findOrFail($teacherId);
 
@@ -75,8 +75,19 @@ $groups = $student->groups->where('teacher_id', $teacherId);
         ->pluck('is_paid', 'month')
         ->toArray();
 
-    return view('student.teacher-details', compact('student', 'teacher', 'groups', 'months', 'payments', 'year'));
+    // ✅ الكويزات مع نتائج الطالب
+    $quizzes = \App\Models\Quiz::where('teacher_id', $teacherId)
+        ->whereIn('group_id', $groups->pluck('id')) // الكويزات الخاصة بمجموعات الطالب
+        ->with(['results' => function($q) use ($studentId) {
+            $q->where('student_id', $studentId);
+        }])
+        ->get();
+
+    return view('student.teacher-details', compact(
+        'student', 'teacher', 'groups', 'months', 'payments', 'year', 'quizzes'
+    ));
 }
+
 
 
 }

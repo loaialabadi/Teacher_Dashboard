@@ -93,6 +93,49 @@
             </tbody>
         </table>
     </div>
+<hr>
+
+{{-- جدول الكويزات --}}
+<h5 class="mb-3">📝 الكويزات مع هذا المدرس:</h5>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>📖 المجموعة</th>
+                <th>📌 العنوان</th>
+                <th>📝 الوصف</th>
+                <th>📅 التاريخ</th>
+                <th>🔢 الدرجة</th>
+                <th>💬 الملاحظة</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($quizzes as $quiz)
+                @php
+                    $result = $quiz->results->first();
+                @endphp
+                <tr>
+                    <td>{{ $quiz->group->name ?? '-' }}</td>
+                    <td>{{ $quiz->title }}</td>
+                    <td>{{ $quiz->description }}</td>
+                    <td>{{ $quiz->quiz_date }}</td>
+                    <td>
+                        @if($result)
+                            <span class="badge bg-primary">{{ $result->score }}</span>
+                        @else
+                            <span class="badge bg-secondary">لم يتم التصحيح</span>
+                        @endif
+                    </td>
+                    <td>{{ $result->note ?? '-' }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center">❌ لا يوجد كويزات</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 
     <a href="{{ route('students.show', $student->id) }}" class="btn btn-secondary mt-3">
         ⬅ رجوع للمدرسين

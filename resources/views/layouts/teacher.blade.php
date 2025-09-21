@@ -103,6 +103,13 @@
 
 
 
+              <a href="{{ route('teachers.teacher.settings', $teacher->id) }}" class="{{ request()->routeIs('teachers.teacher.settings') ? 'active' : '' }}">
+                  <i class="fas fa-list"></i> إعدادات المعلم
+              </a>
+
+
+
+
   </div>
 
   <!-- ✅ Content -->
