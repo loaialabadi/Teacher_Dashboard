@@ -36,9 +36,9 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
-                $this->call([
-            StudentSeeder::class,
-        ]);
+        //         $this->call([
+        //     StudentSeeder::class,
+        // ]);
 
     }}
         // 4. ننشئ بيانات الطلاب مع الربط بالآباء والمعلمين والفصول

@@ -109,6 +109,13 @@
 
 
 
+        <a href="{{ route('teachers.lectures.lecture_changes.index', $teacher->id) }}" class="{{ request()->routeIs('teachers.lecture_changes.*') ? 'active' : '' }}">
+        <i class="fas fa-calendar-alt"></i> <span>تغييرات المواعيد</span>
+    </a>
+
+
+
+
 
   </div>
 

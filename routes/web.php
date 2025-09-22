@@ -12,6 +12,8 @@ use App\Http\Controllers\Teacher\TeachersController;
 use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\Teacher\Payments\PaymentsController;
 use App\Http\Controllers\Teacher\Quiz\QuizController;
+use App\Http\Controllers\Teacher\Lecture\LectureChangeController;
+use App\Http\Controllers\Teacher\Lecture\ExtraLectureController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ParentController;
@@ -130,6 +132,19 @@ Route::post('{group}/add-students', [GroupController::class, 'assignStudents'])-
         Route::put('/{lecture}', [LectureController::class, 'update'])->name('update');
         Route::delete('/{lecture}', [LectureController::class, 'destroy'])->name('destroy');
     Route::get('grades', [LectureController::class, 'grades'])->name('bygrades'); // الفصول
+
+
+
+
+Route::resource('lecture_changes', LectureChangeController::class)
+    ->parameters(['lecture_changes' => 'lectureChange']);
+
+Route::resource('extra_lectures', ExtraLectureController::class);
+
+
+
+
+
 // عرض المجموعات الخاصة بفصل معين
 Route::get('grades/{grade}/groups', [LectureController::class, 'groups'])
     ->name('bygrade.groups');
