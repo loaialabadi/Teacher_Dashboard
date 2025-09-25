@@ -1,6 +1,10 @@
 @extends('layouts.teacher')
 @section('content')
 <div class="container my-4">
+
+
+
+<a href="{{ route('teachers.lectures.index', $teacher->id) }}" class="btn btn-secondary mb-3">← العودة إلى قائمة المحاضرات</a>
     <h2>📚 الفصول الدراسية للمعلم: {{ $teacher->name }}</h2>
     <div class="row">
         @foreach($grades as $grade)

@@ -4,57 +4,79 @@
 <div class="container my-4">
 
     {{-- عنوان الصفحة --}}
-    <h2 class="mb-4 text-center">📘 جدول محاضرات: {{ $teacher->name }}</h2>
+    <h2 class="mb-4 text-center">📅 جدول محاضرات: {{ $teacher->name }}</h2>
 
-    @forelse ($lecturesByDay as $day => $dayLectures)
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">{{ $day }}</h4>
-            </div>
-            <div class="card-body p-0">
-                @if($dayLectures->count())
-                    <table class="table table-bordered table-hover mb-0 text-center align-middle">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>العنوان</th>
-                                <th>الوصف</th>
-                                <th>المادة</th>
-                                <th>الوقت</th>
-                                <th>المجموعة</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($dayLectures as $lecture)
-                                <tr>
-                                    <td>{{ $lecture->title }}</td>
-                                    <td>{{ $lecture->description ?? '-' }}</td>
-                                    <td>{{ $lecture->subject->name ?? '-' }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($lecture->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($lecture->end_time)->format('H:i') }}</td>
-                                    <td>{{ $lecture->group->name ?? '-' }}</td>
-                                    <td>
-                                        {{-- روابط الحضور --}}
-                                        <a href="{{ route('teachers.lectures.attendance.create', ['teacher' => $teacher->id, 'lecture' => $lecture->id]) }}" 
-                                           class="btn btn-success btn-sm">
-                                           📝 تسجيل حضور
-                                        </a>
-                                        <a href="{{ route('teachers.lectures.attendance.report', ['teacher' => $teacher->id, 'lecture' => $lecture->id]) }}" 
-                                           class="btn btn-info btn-sm">
-                                           📊 تقرير
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @else
-                    <div class="alert alert-secondary text-center m-0 p-2">لا توجد محاضرات في هذا اليوم</div>
-                @endif
-            </div>
-        </div>
-    @empty
-        <div class="alert alert-info text-center">لا توجد محاضرات حالياً</div>
-    @endforelse
+    @php
+        use Carbon\Carbon;
+
+        // الشهر الحالي
+        $currentMonth = Carbon::now()->startOfMonth();
+        $startOfMonth = $currentMonth->copy();
+        $endOfMonth   = $currentMonth->copy()->endOfMonth();
+
+        // بداية الأسبوع من الأحد (أو الاثنين حسب رغبتك)
+        $startOfCalendar = $startOfMonth->copy()->startOfWeek(Carbon::SUNDAY);
+        $endOfCalendar   = $endOfMonth->copy()->endOfWeek(Carbon::SATURDAY);
+
+        $period = new DatePeriod($startOfCalendar, new DateInterval('P1D'), $endOfCalendar->copy()->addDay());
+
+        // نجمع المحاضرات حسب اليوم
+        $lecturesByDate = $lectures->groupBy(function($lecture) {
+            return Carbon::parse($lecture->start_time)->toDateString();
+        });
+    @endphp
+
+    <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>الأحد</th>
+                    <th>الاثنين</th>
+                    <th>الثلاثاء</th>
+                    <th>الأربعاء</th>
+                    <th>الخميس</th>
+                    <th>الجمعة</th>
+                    <th>السبت</th>
+                </tr>
+            </thead>
+            <tbody>
+@foreach ($period as $date)
+    @php
+        $carbonDate = Carbon::instance($date);
+        $dayLectures = $lecturesByDate[$carbonDate->toDateString()] ?? collect();
+        $week[] = [
+            'date' => $carbonDate,
+            'lectures' => $dayLectures
+        ];
+    @endphp
+
+    @if(count($week) == 7)
+        <tr>
+            @foreach ($week as $day)
+                <td style="min-height:120px; vertical-align: top;">
+                    <div class="fw-bold mb-1">{{ $day['date']->day }}</div>
+
+@forelse ($day['lectures'] as $lecture)
+    <div class="bg-primary text-white rounded p-1 mb-1 small">
+        📘 {{ $lecture->title }} <br>
+        👥 {{ $lecture->group->name ?? '-' }} <br>
+        📖 {{ $lecture->subject->name ?? '-' }} <br>
+🏫 {{ $lecture->group->grade->name ?? '-' }} <br>
+        🕒 ({{ \Carbon\Carbon::parse($lecture->start_time)->format('H:i') }})
+    </div>
+@empty
+    <div class="text-muted small">-</div>
+@endforelse
+                </td>
+            @endforeach
+        </tr>
+        @php $week = []; @endphp
+    @endif
+@endforeach
+
+            </tbody>
+        </table>
+    </div>
 
 </div>
 @endsection
